@@ -2,6 +2,7 @@
    Agent Town. Day is a Bengaluru morning; on-call mode is the night shift.
    Scene colours are registered properties so the whole town fades between them.
    ===================================================================== */
+@import './fonts.css';
 @property --haze { syntax: '<color>'; inherits: true; initial-value: #eaf5ff; }
 @property --sky-1 { syntax: '<color>'; inherits: true; initial-value: #8fd0ff; }
 @property --sky-2 { syntax: '<color>'; inherits: true; initial-value: #cdeaff; }
