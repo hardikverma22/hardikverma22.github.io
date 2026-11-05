@@ -16,7 +16,7 @@ const SWEEP = 1.7; // seconds for the sweep to cross the town
 const CAP = 1200;  // the most we wait for the page to settle before drawing anyway (ms)
 
 // Resolves once the intro is over (straight away when it doesn't run), so heavy page work can wait for it.
-export function runIntro({ reduced, onDone, onSwap, gate = Promise.resolve() }) {
+export function runIntro({ reduced, onDone, onSwap, gate = Promise.resolve(), boot = Promise.resolve() }) {
   let done;
   const over = new Promise((ok) => { done = ok; });
   const root = document.documentElement;
@@ -66,7 +66,7 @@ export function runIntro({ reduced, onDone, onSwap, gate = Promise.resolve() }) 
   gate.then(() => {
     SKIP.forEach((ev) => addEventListener(ev, skip, { passive: true }));
     const cap = new Promise((ok) => setTimeout(ok, CAP));
-    Promise.race([Promise.all([loaded, fonts]).then(steady), cap, skipped]).then(() => { if (!drawn) { drawn = true; draw(); } });
+    Promise.race([Promise.all([loaded, fonts, boot]).then(steady), cap, skipped]).then(() => { if (!drawn) { drawn = true; draw(); } });
   });
 
   function draw() {

@@ -951,12 +951,22 @@ initSfx();
 const prefs = initPrefs({ reduced, lenis, setNight, music: { play: playMusic, pause: pauseMusic } });
 // the page holds still until the town has been drawn and coloured in
 if (root.classList.contains('intro')) lenis?.stop();
-const introOver = runIntro({ reduced, gate: prefs.gate, onSwap: headline.play, onDone: () => { lenis?.start(); setTimeout(headline.play, 250); } });
+// The road's maths (measuring the page, sampling the path) is the heaviest step at boot, and none of it is on
+// screen yet. It runs once the ticket has settled in and the browser is idle, and the intro waits for it, so it
+// never lands mid-sweep. A comment node holds the walker's place in <body>: the stacking order stays as it was.
+const guideAnchor = document.body.appendChild(document.createComment('guide'));
+let guided = false;
+const runGuide = () => { if (!guided) { guided = true; initGuide({ reduced, anchor: guideAnchor }); } };
+const guideReady = new Promise((ok) => setTimeout(() => {
+  const go = () => { runGuide(); ok(); };
+  if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 0);
+}, 1400));
+const introOver = runIntro({ reduced, gate: prefs.gate, boot: guideReady, onSwap: headline.play, onDone: () => { lenis?.start(); setTimeout(headline.play, 250); } });
 // the full scroll refresh is heavy; let it wait until the intro has finished so it can't stall it
 addEventListener('load', () => introOver.then(() => ScrollTrigger.refresh()));
 
 /* ---------------- the guide: one bot that walks you through the whole page ---------------- */
-initGuide({ reduced });
+introOver.then(runGuide);
 initNudge({ reduced, scrollToEl });
 initProgress({ reduced, scrollToEl });
 initCursor({ reduced });
