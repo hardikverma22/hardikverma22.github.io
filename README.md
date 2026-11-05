@@ -1,6 +1,6 @@
 # Hardik Verma — portfolio
 
-Staff Software Engineer building AI agents. Live at **https://hardikverma22.github.io/Portfolio/**.
+Staff Software Engineer building AI agents. Live at **https://hardikverma22.github.io/**.
 
 Vanilla JS + Vite, with Three.js / WebGL (fluid ink, halftone portrait), GSAP + ScrollTrigger and Lenis. All content lives in `src/data.js`.
 
