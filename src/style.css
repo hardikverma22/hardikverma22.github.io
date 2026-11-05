@@ -631,7 +631,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .pc::after { content: ''; position: absolute; top: 28px; bottom: 28px; left: 56.5%; width: 2px; background: repeating-linear-gradient(var(--ink) 0 6px, transparent 6px 11px); opacity: .45; }
 .pc-l { display: flex; flex-direction: column; justify-content: center; gap: 14px; min-width: 0; }
 .pc-q { margin: 0; font: 700 clamp(24px, 2.4vw, 34px)/1.12 var(--f-hand); text-wrap: pretty; }
-.pc-sig { margin: 0; font-size: 26px; color: var(--rose); rotate: -3deg; }
+.pc-sig { margin: 0; font-size: 26px; color: var(--rose-ink); rotate: -3deg; }
 .pc-more, .pc-fold { align-self: flex-start; font: 700 12px var(--f-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--ink); background: var(--sun); border: 2px solid var(--ink); border-radius: 99px; padding: 6px 12px; box-shadow: 2px 2px 0 var(--ink); }
 .pc-full { position: absolute; z-index: 3; inset: 0; background: #fffaf0; padding: 28px; display: flex; flex-direction: column; gap: 14px; cursor: auto; }
 .pc-full[hidden] { display: none; }
@@ -1114,7 +1114,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .dev-label { display: grid; gap: 4px; padding: 14px 16px 16px; background: var(--card); border: 2.5px solid var(--ink); border-radius: 14px; box-shadow: 4px 4px 0 var(--ink); min-height: 150px; align-content: start; }
 .dev-label b { font: 800 24px/1.05 var(--f-display); font-variation-settings: 'SOFT' 100; }
 .dev-label small { font-size: 14.5px; line-height: 1.35; color: #4b4560; }
-.dev-label em { margin-top: 6px; font: 700 13px var(--f-mono); font-style: normal; color: var(--rose); }
+.dev-label em { margin-top: 6px; font: 700 13px var(--f-mono); font-style: normal; color: var(--rose-ink); }
 @media (hover: hover) and (pointer: fine) { .dev:hover .dev-label em { text-decoration: underline; text-underline-offset: 3px; } }
 .dev-kind { justify-self: start; font: 700 10px var(--f-mono); text-transform: uppercase; letter-spacing: .1em; padding: 3px 7px; border: 1.5px solid var(--ink); border-radius: 5px; background: #fff; }
 .dev-kind-tool { background: var(--ink); color: #fff8e6; }
