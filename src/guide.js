@@ -72,7 +72,7 @@ function road(svg, d, w, paint, extra = '') {
   }
 }
 
-export function initGuide({ reduced }) {
+export function initGuide({ reduced, anchor }) {
   const route = $('#route'), svg = $('#route-svg'), junction = $('#junction'), ride = $('#ride');
   const town = $('#town'), journey = $('#journey'), stall = $('#stall');
   ride.innerHTML = AUTO;
@@ -254,7 +254,8 @@ export function initGuide({ reduced }) {
   walker.className = 'ride-walker';
   walker.setAttribute('aria-hidden', 'true');
   walker.innerHTML = buddySvg();
-  document.body.append(walker);
+  // main.js can run this a moment after first paint; the walker then takes the spot it always had in <body>
+  if (anchor?.isConnected) anchor.replaceWith(walker); else document.body.append(walker);
   let endState = 'away', parkedSince = 0, endTl = null;
   const tellStall = (detail) => document.dispatchEvent(new CustomEvent('stall', { detail }));
   function resetEnding() {

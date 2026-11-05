@@ -31,7 +31,7 @@ function initMedals(reduced) {
     const short = cut > 0 ? title.slice(0, cut) : title, more = cut > 0 ? title.slice(cut + 2) : '';
     const [id, c] = co[w];
     return `<li class="mr" style="--c:${c}">
-      <button class="mr-hang" aria-pressed="false" aria-label="${esc(title)}, ${esc(w)}${y === '·' ? '' : `, ${y}`}. Tap to flip.">
+      <button class="mr-hang" aria-pressed="false" aria-label="${y === '·' ? '' : `${y}: `}${esc(title)}, ${esc(w)}. Tap to flip.">
         <span class="mr-rib" aria-hidden="true"></span>
         <span class="mr-coin" aria-hidden="true"><span class="mr-face mr-front"><b>${y === '·' ? '★' : esc(y)}</b>${mark(id, 'mr-mk')}</span><span class="mr-face mr-back"><small>for</small>${esc(more || short)}</span></span>
       </button>

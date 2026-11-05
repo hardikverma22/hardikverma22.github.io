@@ -6,9 +6,7 @@ import { skillsBuilt, markets, writing, testimonials, projects, toolbox, toolbox
 import { buildings, story, stickies, milestones, tiffin } from './world.js';
 import { townMarkup, agentCar, skylines } from './town.js';
 import { mark } from './marks.js';
-import { initLab } from './lab.js';
 import { initGuide } from './guide.js';
-import { initStack } from './stack.js';
 import { initNudge } from './nudge.js';
 import { initProgress } from './progress.js';
 import { initCursor } from './cursor.js';
@@ -455,7 +453,7 @@ const paintStory = (p) => {
 if (reduced) paintStory(1);
 else ScrollTrigger.create({ trigger: '#tell', start: 'top 78%', end: 'bottom 42%', scrub: true, onUpdate: (s) => paintStory(s.progress) });
 
-$('#stickies').innerHTML = `<figure class="pola"><img src="hero-color.webp" alt="Hardik Verma" width="768" height="1024" loading="lazy" /><figcaption class="hand">hi, that’s me</figcaption></figure>` + stickies.map((s) => `<div class="sticky sk-${s.c}" style="--r:${s.r}deg">${esc(s.t)}${s.s ? `<small>${esc(s.s)}</small>` : ''}</div>`).join('');
+$('#stickies').innerHTML = `<figure class="pola"><img src="hero-color-480.webp" alt="Hardik Verma" width="480" height="640" loading="lazy" /><figcaption class="hand">hi, that’s me</figcaption></figure>` + stickies.map((s) => `<div class="sticky sk-${s.c}" style="--r:${s.r}deg">${esc(s.t)}${s.s ? `<small>${esc(s.s)}</small>` : ''}</div>`).join('');
 if (!reduced) gsap.fromTo('.pola, .sticky', { y: -70, rotation: 14, autoAlpha: 0 }, { y: 0, rotation: 0, autoAlpha: 1, stagger: 0.18, duration: 0.9, ease: 'back.out(1.8)', clearProps: 'transform,rotate,translate,scale', scrollTrigger: { trigger: '#stickies', start: 'top 75%' } });
 
 gsap.to('.rd-bot', { x: () => $('.rd-road').offsetWidth - 64, ease: 'none', scrollTrigger: { trigger: '.road-div', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true } });
@@ -463,7 +461,7 @@ gsap.to('.rd-bot', { x: () => $('.rd-road').offsetWidth - 64, ease: 'none', scro
 /* =====================================================================
    LAB: the workbench, and a case page per project (see lab.js)
    ===================================================================== */
-initLab({ reduced, lenis });
+// (initLab runs at idle with the other below-the-fold set-up, see guideReady)
 // each smaller tool gets a little screen that loops what it does
 const mtScene = {
   miner: () => `<div class="mts-rows">${['a', 'b', 'c', 'b', 'd', 'b'].map((k, i) => `<i class="r-${k}" style="--i:${i}"></i>`).join('')}</div><span class="mts-chip">3× seen → <b>skill.md</b></span>`,
@@ -590,7 +588,7 @@ const stampDate = { cl: 'Feb 2026', mx: '2024–26', sams: '2026 – now', ca: '
 const short = { cl: 'CHILE', mx: 'MÉXICO', sams: 'SAM’S MX', ca: 'CANADA', za: 'S. AFRICA' };
 $('#pp-left').innerHTML = `
   <div class="pp-h"><span>Identity platform</span><span>IND</span></div>
-  <div class="pp-id"><img class="pp-photo" src="hero-color.webp" alt="Hardik Verma" loading="lazy" width="116" height="146" />
+  <div class="pp-id"><img class="pp-photo" src="hero-color-480.webp" alt="Hardik Verma" loading="lazy" width="116" height="146" />
     <div class="pp-f"><div><span>Surname</span><b>VERMA</b></div><div><span>Given name</span><b>HARDIK</b></div><div><span>Role</span><b>STAFF SOFTWARE ENGINEER</b></div><div><span>Issued by</span><b>WALMART GLOBAL TECH</b></div><div><span>Valid since</span><b>JUL 2024</b></div></div></div>
   <p class="pp-sign">Hardik V.</p>
   <div class="pp-mrz">P&lt;INDVERMA&lt;&lt;HARDIK&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br/>IDENTITY&lt;PLATFORM&lt;STAFF&lt;2026&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>`;
@@ -749,7 +747,7 @@ document.fonts?.ready.then(hangPolaroids);
 /* =====================================================================
    STACK: the keyboard + the medal rack (see keyboard.js, stack.js)
    ===================================================================== */
-initStack({ reduced });
+// (initStack: same)
 
 /* =====================================================================
    CONTACT: the chai stall at the end of the road, and the town at night
@@ -951,12 +949,29 @@ initSfx();
 const prefs = initPrefs({ reduced, lenis, setNight, music: { play: playMusic, pause: pauseMusic } });
 // the page holds still until the town has been drawn and coloured in
 if (root.classList.contains('intro')) lenis?.stop();
-const introOver = runIntro({ reduced, gate: prefs.gate, onSwap: headline.play, onDone: () => { lenis?.start(); setTimeout(headline.play, 250); } });
+// The road's maths (measuring the page, sampling the path) is the heaviest step at boot, and none of it is on
+// screen yet. It runs once the ticket has settled in and the browser is idle, and the intro waits for it, so it
+// never lands mid-sweep. A comment node holds the walker's place in <body>: the stacking order stays as it was.
+const guideAnchor = document.body.appendChild(document.createComment('guide'));
+let guided = false;
+const runGuide = () => { if (!guided) { guided = true; initGuide({ reduced, anchor: guideAnchor }); } };
+// The lab bench and the medal rack are below the fold, so their code loads as separate chunks and builds here too.
+const guideReady = new Promise((ok) => setTimeout(() => {
+  const go = async () => {
+    try {
+      const [{ initLab }, { initStack }] = await Promise.all([import('./lab.js'), import('./stack.js')]);
+      initLab({ reduced, lenis });
+      initStack({ reduced });
+    } finally { runGuide(); ok(); }
+  };
+  if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 0);
+}, 1400));
+const introOver = runIntro({ reduced, gate: prefs.gate, boot: guideReady, onSwap: headline.play, onDone: () => { lenis?.start(); setTimeout(headline.play, 250); } });
 // the full scroll refresh is heavy; let it wait until the intro has finished so it can't stall it
 addEventListener('load', () => introOver.then(() => ScrollTrigger.refresh()));
 
 /* ---------------- the guide: one bot that walks you through the whole page ---------------- */
-initGuide({ reduced });
+introOver.then(runGuide);
 initNudge({ reduced, scrollToEl });
 initProgress({ reduced, scrollToEl });
 initCursor({ reduced });

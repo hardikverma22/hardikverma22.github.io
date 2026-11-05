@@ -40,7 +40,7 @@ export function initProgress({ reduced, scrollToEl }) {
   bar.className = 'stopbar';
   bar.setAttribute('aria-label', 'Where you are on the page');
   bar.innerHTML = `
-    <button class="sb-here" type="button" aria-expanded="false" aria-controls="sb-list"><span class="sb-n"></span><b class="sb-name"></b><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 7.5 6 4.5l3 3"/></svg></button>
+    <button class="sb-here" type="button" aria-expanded="false" aria-controls="sb-list" aria-label="Stops"><span class="sb-n"></span><b class="sb-name"></b><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 7.5 6 4.5l3 3"/></svg></button>
     <span class="sb-track" aria-hidden="true"><i class="sb-fill"></i></span>
     <button class="sb-next" type="button"><span class="sb-next-t">Next</span> <span aria-hidden="true">↓</span></button>
     <ol class="sb-list" id="sb-list" hidden>${STOPS.map(([id, name], i) => `<li><a href="#${id}" data-i="${i}"><span>${String(i + 1).padStart(2, '0')}</span>${name}</a></li>`).join('')}</ol>`;
@@ -80,6 +80,7 @@ export function initProgress({ reduced, scrollToEl }) {
     if (i < 0) return;
     $('.sb-n', bar).textContent = `${String(i + 1).padStart(2, '0')}/${STOPS.length}`;
     $('.sb-name', bar).textContent = STOPS[i][1];
+    here.setAttribute('aria-label', `${$('.sb-n', bar).textContent} ${STOPS[i][1]}`);
     const last = i === STOPS.length - 1;
     $('.sb-next-t', bar).textContent = last ? 'Top' : STOPS[i + 1][1];
     next.lastElementChild.textContent = last ? '↑' : '↓';
