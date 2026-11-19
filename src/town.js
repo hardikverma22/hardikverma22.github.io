@@ -522,18 +522,53 @@ export function townMarkup() {
   return { sky: sky(), far: far(), mid: mid(), street: street(), fg: fg() };
 }
 
-// The little companion bot that sits in the corner and talks.
+// The guide: the companion bot that greets you, peeks in and walks the road. A rounded cream helmet with a
+// glossy visor, capsule eyes with catchlights, a small smile and blush, ear pods, a glowing antenna, a coral
+// body with a chest panel, two arms (the right one waves) and little boots. Flat colours with soft highlight
+// shapes, no gradients, so it can appear many times on a page without clashing ids.
+// Hooks other code relies on: .bd-body, .bd-arm (waves), .bd-eyes (follows the pointer), .blink, .beacon.
 export function buddySvg() {
+  const o = (w = 2.6) => s2(w);
   return `<svg viewBox="-40 -80 80 96" aria-hidden="true">
-    <ellipse cx="0" cy="12" rx="24" ry="4" fill="rgba(0,0,0,.18)"/>
+    <ellipse cx="0" cy="12.5" rx="21" ry="3.6" fill="rgba(0,0,0,.18)"/>
     <g class="bd-body">
-    <path d="M-8 0 v10 M8 0 v10" ${s2(5)}/>
-    <rect x="-16" y="-22" width="32" height="24" rx="8" fill="var(--rose)" ${S}/>
-    <path class="bd-arm" d="M16 -14 q14 -6 16 -22" fill="none" ${s2(4)}/>
-    <rect x="-22" y="-62" width="44" height="36" rx="11" fill="#fff8e6" ${S}/>
-    <rect x="-16" y="-56" width="32" height="22" rx="6" fill="${INK}"/>
-    <g class="bd-eyes"><g class="blink"><circle cx="-6" cy="-45" r="3.2" fill="#7dffb0"/><circle cx="6" cy="-45" r="3.2" fill="#7dffb0"/></g></g>
-    <path d="M0 -62 v-10" ${s2(3)}/><circle class="beacon" cx="0" cy="-74" r="4.5" fill="var(--sun)" ${s2(2)}/>
+    <!-- legs and boots -->
+    <path d="M-7 1 v6 M7 1 v6" ${o(4.2)}/>
+    <path d="M-12.5 11.5 q0 -5.5 5.5 -5.5 h1.5 q3 0 3 3 v2.5 z M12.5 11.5 q0 -5.5 -5.5 -5.5 h-1.5 q-3 0 -3 3 v2.5 z" fill="#3b3656" ${o(2.2)}/>
+    <!-- resting left arm -->
+    <path d="M-15.5 -15 q-8 3 -8.5 12" fill="none" ${o(4)}/><circle cx="-24" cy="-2.5" r="3.4" fill="#fff8e6" ${o(2.2)}/>
+    <!-- body -->
+    <rect x="-17" y="-25" width="34" height="28" rx="11" fill="var(--rose)" ${o()}/>
+    <path d="M-12.5 -19.5 q1 -2.8 4.5 -3" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M-15 -1.5 q15 5 30 0" fill="none" stroke="rgba(33,28,51,.18)" stroke-width="2.2" stroke-linecap="round"/>
+    <rect x="-8.5" y="-18.5" width="17" height="11.5" rx="3.5" fill="#fff8e6" ${o(2)}/>
+    <circle class="bd-heart" cx="-3" cy="-12.7" r="2.3" fill="var(--sun)" ${o(1.4)}/>
+    <path d="M1.5 -14.5 h4 M1.5 -11 h2.5" ${o(1.6)}/>
+    <!-- waving right arm -->
+    <g class="bd-arm"><path d="M15.5 -15 q10 -3 12.5 -17" fill="none" ${o(4)}/><circle cx="28.5" cy="-33.5" r="3.6" fill="#fff8e6" ${o(2.2)}/></g>
+    <!-- neck -->
+    <rect x="-5" y="-29" width="10" height="5" rx="2" fill="#3b3656"/>
+    <!-- ear pods -->
+    <rect x="-28.5" y="-52" width="7" height="13" rx="3.5" fill="var(--sun)" ${o(2.2)}/>
+    <rect x="21.5" y="-52" width="7" height="13" rx="3.5" fill="var(--sun)" ${o(2.2)}/>
+    <!-- helmet -->
+    <rect x="-23" y="-66" width="46" height="39" rx="15" fill="#fff8e6" ${o(2.8)}/>
+    <path d="M-17.5 -58 q2.5 -4.5 8 -5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M-20 -33 q20 6 40 0" fill="none" stroke="rgba(33,28,51,.12)" stroke-width="2.4" stroke-linecap="round"/>
+    <!-- visor, with a glassy sheen -->
+    <rect x="-17.5" y="-59.5" width="35" height="25" rx="9.5" fill="#1d1b3c" ${o(2.2)}/>
+    <path d="M-14 -55 l7 -2.2 l-9.5 14 l-2 -3.5 z" fill="#fff" fill-opacity=".14"/>
+    <g class="bd-eyes"><g class="blink">
+      <rect x="-10.5" y="-52" width="6.4" height="9.5" rx="3.2" fill="#7dffb0"/><rect x="4.1" y="-52" width="6.4" height="9.5" rx="3.2" fill="#7dffb0"/>
+      <circle cx="-6" cy="-49.6" r="1.25" fill="#fff"/><circle cx="8.6" cy="-49.6" r="1.25" fill="#fff"/>
+    </g></g>
+    <path d="M-2.6 -39.5 q2.6 2.4 5.2 0" fill="none" stroke="#7dffb0" stroke-width="1.6" stroke-linecap="round"/>
+    <ellipse cx="-12.5" cy="-39.5" rx="2.8" ry="1.6" fill="#ff8fa3" fill-opacity=".6"/><ellipse cx="12.5" cy="-39.5" rx="2.8" ry="1.6" fill="#ff8fa3" fill-opacity=".6"/>
+    <!-- antenna -->
+    <path d="M0 -66 v-7" ${o(2.8)}/>
+    <circle cx="0" cy="-76" r="7.5" fill="var(--sun)" fill-opacity=".22"/>
+    <circle class="beacon" cx="0" cy="-76" r="4.2" fill="var(--sun)" ${o(2)}/>
+    <circle cx="-1.3" cy="-77.4" r="1.2" fill="#fff" fill-opacity=".8"/>
     </g></svg>`;
 }
 

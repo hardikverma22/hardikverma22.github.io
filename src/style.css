@@ -1021,7 +1021,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @keyframes fairy { from { fill-opacity: 1; } to { fill-opacity: .35; } }
 
 /* bots' eyes glow, lamps and headlights brighter */
-[data-mode='night'] .bot-bob .blink circle, [data-mode='night'] .bd-eyes circle { filter: drop-shadow(0 0 3px #7dffb0); }
+[data-mode='night'] .bot-bob .blink circle, [data-mode='night'] .bd-eyes rect { filter: drop-shadow(0 0 3px #7dffb0); }
 .lamp .cone { --to: .4; } .lamp .pool { --to: .6; }
 [data-mode='night'] .lamp .bulb { filter: drop-shadow(0 0 8px #ffe9a8); }
 [data-mode='night'] .hl { opacity: .65; }
@@ -1980,38 +1980,6 @@ html.has-cur input, html.has-cur textarea, html.has-cur select, html.has-cur [co
 @media (prefers-reduced-motion: reduce) { .balloon { animation: none; left: 30%; } .bl-bob, .bl-badge { animation: none !important; } }
 
 
-/* ---------------- intro (intro.js): the town draws itself, then colour washes up ----------------
-   Built to stay smooth: the line drawing is a static copy of the town, revealed by a paper "eraser" that
-   slides off it, and the colour comes up as the whole cover wipes away. Only transforms animate. */
-:root { --sketch: #211c33; }
-[data-mode='night'] { --sketch: #f3ecdf; }
-/* before the cover is in place, the finished town must not show */
-.sketch:not(.cover-ready) .stage { background: var(--paper); }
-.sketch:not(.cover-ready) .stage > :not(.hero-copy) { visibility: hidden; }
-/* the cover: plain paper, the line drawing on it, and the eraser that reveals the drawing */
-/* the cover reaches 140px below the screen, where its soft lower edge waits out of sight; as it wipes up,
-   that edge is what passes over the town, so the colour rises like a wash rather than a hard line */
-.intro-cover { position: absolute; inset: 0 0 -140px; z-index: 4; overflow: hidden; pointer-events: none; will-change: transform;
-  -webkit-mask: linear-gradient(to top, transparent 0, #000 130px); mask: linear-gradient(to top, transparent 0, #000 130px); }
-.intro-cover-in { bottom: 140px !important; }
-.intro-cover-in { position: absolute; inset: 0; will-change: transform; background: var(--paper); }
-.intro-sketch .scene { pointer-events: none; }
-.intro-sketch * { animation: none !important; transition: none !important; }
-.intro-sketch :is(.lights, defs, .tint, .sunwash, .side-shade, .contact-shadows, .dayonly, .nightonly, .pins, .tap-hint, .fx-town) { display: none !important; }
-.intro-sketch :is(path, rect, circle, ellipse, line, polyline, polygon, text) { fill: none !important; stroke: var(--sketch) !important; stroke-width: 1.25px !important; vector-effect: non-scaling-stroke; stroke-dasharray: none !important; opacity: 1 !important; }
-/* the eraser's soft leading edge starts off-screen, so nothing of the drawing shows until the sweep begins */
-.intro-eraser { position: absolute; inset: 0 -160px 0 -150px; will-change: transform; background: linear-gradient(90deg, transparent 0, var(--paper) 140px); }
-/* the copy, tags and top bar wait for the colour */
-.intro-hide :is(.hero-copy > :not(.hello, .h1), .town-dir, .balloon-lane, #top-bar, .fly-cue, .tap-hint, .pin) { opacity: 0; }
-/* until the town has been drawn and coloured in, nothing else shows and the page stays put */
-html.intro, html.intro body { overflow: hidden; }
-html.intro :is(.nudge, .ride, .junction, .route) { visibility: hidden; }
-.intro-hide .hello { clip-path: inset(-20% 100% -40% 0); }
-/* the headline is inked in as outlines first, then filled as the colour arrives */
-.sketch:not(.wash) .h1, .sketch:not(.wash) .h1 * { color: transparent; -webkit-text-stroke: 1.3px var(--sketch); }
-.sketch.wash .h1, .sketch.wash .h1 * { -webkit-text-stroke: 1.3px transparent; transition: color .9s ease, -webkit-text-stroke-color .9s ease; }
-.intro-hide .h1 { clip-path: inset(-20% 100% -30% 0); }
-.sketch:not(.wash) .fix-strike { opacity: 0; }
 
 /* the play badge on the balloon's band: pulses until the music has been played once, then shows pause */
 .bl-badge { transform-box: fill-box; transform-origin: center; }
@@ -2134,69 +2102,6 @@ section.idle, section.idle *, section.idle *::before, section.idle *::after { an
 [data-mode='night'] .mu-t { background: #fff4dd; color: var(--ink); }
 .foot-ticket { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 
-/* ---------------- the entry ticket (prefs.js) ---------------- */
-.tix-open, .tix-open body { overflow: hidden; }
-.tix-scene { position: fixed; inset: 0; z-index: 200; perspective: 1000px; display: grid; place-items: center; padding: 20px 16px; overflow: auto; }
-/* reopened over the page: the town steps back behind a soft scrim */
-/* on arrival the ticket sits under a soft light on a dark stage, so the paper and its tear stand out;
-   tearing it lifts the stage to the blank sheet the town is drawn on */
-.tix-scene.first { background: radial-gradient(120% 85% at 50% 42%, #3d3656 0%, #262038 55%, #18142a 100%); }
-.tix-scene.first .tix { filter: drop-shadow(0 26px 40px rgba(0, 0, 0, .55)) drop-shadow(0 2px 0 rgba(0, 0, 0, .25)); }
-.tix-scene:not(.first) { background: color-mix(in srgb, var(--ink) 38%, transparent); backdrop-filter: blur(6px); }
-.tix { --tk-paper: #fffaf0; --tk-ink: var(--ink); position: relative; display: grid; grid-template-columns: 1fr 132px; width: min(680px, 100%); color: var(--tk-ink); rotate: -1.2deg; filter: drop-shadow(0 18px 30px rgba(33, 28, 51, .22)) drop-shadow(0 2px 0 rgba(33, 28, 51, .12)); }
-.tix-main, .tix-stub { background: var(--tk-paper); border: 2px solid var(--tk-ink); }
-/* the notches where ticket and stub meet are cut from both pieces */
-.tix-main { position: relative; padding: 26px 28px 22px; border-right: 0; border-radius: 18px 0 0 18px;
-  -webkit-mask: radial-gradient(circle 13px at 100% 0, #0000 98%, #000) top right / 100% 51% no-repeat, radial-gradient(circle 13px at 100% 100%, #0000 98%, #000) bottom right / 100% 51% no-repeat;
-          mask: radial-gradient(circle 13px at 100% 0, #0000 98%, #000) top right / 100% 51% no-repeat, radial-gradient(circle 13px at 100% 100%, #0000 98%, #000) bottom right / 100% 51% no-repeat; }
-.tix-stub { position: relative; display: grid; place-items: center; padding: 0; border-left: 2.5px dashed var(--tk-ink); border-radius: 0 18px 18px 0; cursor: grab; touch-action: none; transform-origin: 0 0; font: inherit; color: inherit;
-  -webkit-mask: radial-gradient(circle 13px at 0 0, #0000 98%, #000) top left / 100% 51% no-repeat, radial-gradient(circle 13px at 0 100%, #0000 98%, #000) bottom left / 100% 51% no-repeat;
-          mask: radial-gradient(circle 13px at 0 0, #0000 98%, #000) top left / 100% 51% no-repeat, radial-gradient(circle 13px at 0 100%, #0000 98%, #000) bottom left / 100% 51% no-repeat;
-  background-image: repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--sun) 35%, transparent) 10px 20px); }
-.tix-stub.held { cursor: grabbing; }
-.tix-stub:focus-visible { outline: 3px solid var(--rose-ink); outline-offset: -8px; }
-.tix-stub-in { display: grid; justify-items: center; gap: 6px; padding: 18px 10px; text-align: center; }
-.tix-stub b { font: 800 28px/1 var(--f-display); font-variation-settings: 'SOFT' 100, 'WONK' 1; letter-spacing: -.02em; }
-.tix-stub small { font: 600 18px/1 var(--f-hand); color: var(--rose-ink); }
-.tix-stub svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; animation: tknudge 1.8s var(--out) 1.4s infinite; }
-@keyframes tknudge { 0%, 60%, 100% { translate: 0 0; } 30% { translate: 0 5px; } }
-.tix-no { margin-top: 10px; font: 700 11px var(--f-mono); letter-spacing: .08em; opacity: .7; }
-.tix-k { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; margin: 0; font: 700 11px var(--f-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--rose-ink); }
-.tix-h { margin: 12px 0 18px; font: 800 clamp(24px, 3.4vw, 32px)/1.08 var(--f-display); font-variation-settings: 'SOFT' 100, 'WONK' 1; letter-spacing: -.015em; text-wrap: balance; }
-.tix-row { display: grid; grid-template-columns: 64px 1fr; align-items: center; gap: 10px; margin: 0 0 12px; padding: 12px 0 0; border: 0; border-top: 1.5px dashed color-mix(in srgb, var(--tk-ink) 30%, transparent); }
-.tix-row legend { float: left; padding: 0; font: 700 12px var(--f-body); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
-.tix-opts { display: flex; flex-wrap: wrap; gap: 8px; }
-.tix-opt { position: relative; cursor: pointer; }
-.tix-opt input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
-.tix-opt span { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 7px 14px 7px 11px; border-radius: 999px; border: 2px solid var(--tk-ink); background: transparent; font: 700 14px var(--f-body);
-  transition: background-color .18s var(--out), color .18s var(--out), box-shadow .18s var(--out), translate .18s var(--out); }
-.tix-opt svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-.tix-opt input:checked + span { background: var(--sun); box-shadow: 2px 2px 0 var(--tk-ink); translate: -1px -1px; }
-.tix-opt input:focus-visible + span { outline: 3px solid var(--rose-ink); outline-offset: 2px; }
-.tix-opt:active span { scale: .96; }
-@media (hover: hover) and (pointer: fine) { .tix-opt:hover input:not(:checked) + span { background: color-mix(in srgb, var(--sun) 30%, transparent); } }
-.tix-fine { margin: 6px 0 0; font: 600 13px var(--f-body); color: var(--ink-2); }
-/* night: the ticket stays paper, but warmer, under the dark sky */
-[data-mode='night'] .tix { --tk-paper: #fff4dd; filter: drop-shadow(0 18px 40px rgba(0, 0, 0, .5)); }
-/* phones: the stub sits below, torn off downwards along a horizontal perforation */
-@media (max-width: 600px) {
-  .tix { grid-template-columns: 1fr; rotate: -.6deg; }
-  .tix-main { padding: 22px 18px 18px; border-right: 2px solid var(--tk-ink); border-bottom: 0; border-radius: 18px 18px 0 0;
-    -webkit-mask: radial-gradient(circle 13px at 0 100%, #0000 98%, #000) bottom left / 51% 100% no-repeat, radial-gradient(circle 13px at 100% 100%, #0000 98%, #000) bottom right / 51% 100% no-repeat;
-            mask: radial-gradient(circle 13px at 0 100%, #0000 98%, #000) bottom left / 51% 100% no-repeat, radial-gradient(circle 13px at 100% 100%, #0000 98%, #000) bottom right / 51% 100% no-repeat; }
-  .tix-stub { border-left: 2px solid var(--tk-ink); border-top: 2.5px dashed var(--tk-ink); border-radius: 0 0 18px 18px;
-    -webkit-mask: radial-gradient(circle 13px at 0 0, #0000 98%, #000) top left / 51% 100% no-repeat, radial-gradient(circle 13px at 100% 0, #0000 98%, #000) top right / 51% 100% no-repeat;
-            mask: radial-gradient(circle 13px at 0 0, #0000 98%, #000) top left / 51% 100% no-repeat, radial-gradient(circle 13px at 100% 0, #0000 98%, #000) top right / 51% 100% no-repeat; }
-  .tix-stub-in { grid-template-columns: auto auto auto; align-items: center; gap: 12px; padding: 14px 12px; }
-  .tix-no { margin: 0; }
-  .tix-row { grid-template-columns: 1fr; gap: 8px; }
-  .tix-opt span { font-size: 13.5px; padding: 6px 12px 6px 9px; }
-}
-@media (prefers-reduced-motion: reduce) { .tix-stub svg { animation: none; } .tix-opt span { transition: none; } }
-
-/* the tear (prefs.js): the peeling stub lifts off the page and fibres fly */
-.tix-stub { will-change: transform; }
-.tix-fibre { position: fixed; z-index: 2; width: var(--s); height: calc(var(--s) * .6); background: var(--tk-paper, #fffaf0); border: 1px solid color-mix(in srgb, var(--ink) 55%, transparent); clip-path: polygon(0 40%, 35% 0, 100% 30%, 80% 100%, 20% 85%); pointer-events: none; }
 
 /* =====================================================================
    Polish pass (Nov 2026): one chrome style for every floating control, calmer building tags,
@@ -2334,4 +2239,99 @@ section.idle, section.idle *, section.idle *::before, section.idle *::after { an
 @media (hover: hover) and (pointer: fine) {
   .mt-card:hover { rotate: 0deg; transform: translateY(-6px); box-shadow: 0 30px 50px -28px rgba(20, 16, 40, .6); }
   [data-mode='night'] .mt-card:hover { --lc-bd: rgba(255, 244, 221, .26); box-shadow: inset 0 1px 0 rgba(255, 244, 221, .08), 0 34px 60px -30px rgba(0, 0, 0, .95); }
+}
+
+/* ---------------- intro (intro.js): the town builds itself ----------------
+   Until the ticket is torn, the street is empty sky; then the skyline rises, each building springs up
+   from the ground, the street and trees slide in and the headline comes into focus. intro.js sets the
+   start of every move itself; these rules only keep things out of sight before it does. */
+html.intro, html.intro body { overflow: hidden; }
+html.intro :is(.nudge, .ride, .junction, .route) { visibility: hidden; }
+.intro-hide :is(.ly-far, .ly-mid, .ly-street, .ly-fg, .ly-pins, .hero-copy > *, .town-dir, .balloon-lane, #top-bar, .fly-cue, .tap-hint, .pin) { opacity: 0; }
+/* a soft burst of light behind the town as it lands (intro.js) */
+.intro-glow { position: absolute; z-index: 1; left: 50%; bottom: 8%; width: 140vmax; aspect-ratio: 1; translate: -50% 50%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sun) 55%, transparent), color-mix(in srgb, var(--sun) 18%, transparent) 45%, transparent 70%); mix-blend-mode: soft-light; }
+[data-mode='night'] .intro-glow { background: radial-gradient(closest-side, rgba(255, 214, 107, .35), rgba(185, 166, 242, .14) 45%, transparent 70%); mix-blend-mode: screen; }
+/* while the intro moves the tags, their own hover/fade transitions stay out of the way (they'd chase every frame) */
+.intro :is(.pin, .pin-tag) { transition: none !important; }
+
+/* ---------------- the welcome (prefs.js): the guide bot asks two things in the open sky ----------------
+   The sky behind it is the real hero sky (the town is still hidden), so picking day or night shows at once. */
+@property --gw-veil { syntax: '<number>'; inherits: true; initial-value: 1; }
+.tix-open, .tix-open body { overflow: hidden; }
+.gw { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px 16px; overflow: auto; --gw-veil: 1;
+  background: radial-gradient(90% 70% at 50% 45%, transparent 30%, rgba(12, 10, 34, calc(.38 * var(--gw-veil))) 100%); }
+.gw:not(.first) { background: color-mix(in srgb, var(--ink) calc(38% * var(--gw-veil)), transparent); backdrop-filter: blur(calc(6px * var(--gw-veil))); }
+.gw-wrap { position: relative; display: grid; justify-items: center; width: min(470px, 100%); }
+.gw-bot { position: relative; z-index: 2; width: 116px; height: 140px; margin-bottom: -6px; }
+.gw-bot-in, .gw-float { position: absolute; inset: 0; }
+.gw-float { animation: gwfloat 2.8s ease-in-out infinite; }
+.gw-bot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.gw-bot .bd-arm { animation: wave 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 0 100%; }
+.gw-happy { opacity: 0; }
+.gw-happy path { fill: none; stroke: #7dffb0; stroke-width: 2.8; stroke-linecap: round; filter: drop-shadow(0 0 3px #7dffb0); }
+.gw-bot.happy .bd-eyes { opacity: 0; }
+.gw-bot.happy .gw-happy { opacity: 1; }
+@keyframes gwfloat { 50% { translate: 0 -8px; } }
+
+.gw-card { position: relative; width: 100%; padding: 22px 24px 20px; background: #fffaf0; color: var(--ink); border: 2px solid var(--ink); border-radius: 26px;
+  box-shadow: 0 30px 60px -28px rgba(10, 8, 30, .6), 0 2px 0 rgba(33, 28, 51, .08); }
+/* the bubble's tail points up at the bot */
+.gw-card::before, .gw-card::after { content: ''; position: absolute; left: 50%; translate: -50% 0; width: 0; height: 0; border-style: solid; }
+.gw-card::before { bottom: 100%; border-width: 0 13px 15px; border-color: transparent transparent var(--ink); }
+.gw-card::after { bottom: calc(100% - 3px); border-width: 0 10px 12px; border-color: transparent transparent #fffaf0; }
+.gw-hi { margin: 0; font-size: 26px; line-height: 1; color: var(--rose-ink); rotate: -2deg; }
+.gw-h { margin: 8px 0 4px; font: 800 clamp(21px, 2.6vw, 25px)/1.15 var(--f-display); font-variation-settings: 'SOFT' 100, 'WONK' 1; letter-spacing: -.012em; text-wrap: balance; }
+.gw-row { margin: 16px 0 0; padding: 0; border: 0; min-width: 0; }
+.gw-q { padding: 0; margin: 0 0 8px; font: 700 14px var(--f-body); color: var(--ink-2); }
+.gw-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.gw-opt { position: relative; cursor: pointer; }
+.gw-opt input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.gw-opt span { display: inline-flex; align-items: center; gap: 7px; min-height: 42px; padding: 8px 15px 8px 12px; border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--ink) 35%, transparent); background: #fff;
+  font: 700 14.5px var(--f-body); transition: background-color .2s, border-color .2s, box-shadow .3s var(--spring), translate .3s var(--spring), scale .15s var(--out); }
+.gw-opt svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.gw-opt input:checked + span { background: var(--sun); border-color: var(--ink); box-shadow: 2px 3px 0 var(--ink); translate: 0 -2px; }
+.gw-opt input:focus-visible + span { outline: 3px solid var(--rose-ink); outline-offset: 2px; }
+.gw-opt:active span { scale: .95; }
+@media (hover: hover) and (pointer: fine) { .gw-opt:hover input:not(:checked) + span { border-color: var(--ink); background: color-mix(in srgb, var(--sun) 22%, #fff); } }
+.gw-go-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 22px; padding-top: 18px; border-top: 1.5px dashed color-mix(in srgb, var(--ink) 22%, transparent); }
+.gw-go { display: inline-flex; align-items: center; gap: 10px; padding: 13px 24px; border-radius: 999px; border: 2.5px solid var(--ink); background: var(--ink); color: #fff8e6; font: 800 17px var(--f-body); cursor: pointer;
+  box-shadow: 0 10px 24px -12px rgba(33, 28, 51, .7); transition: background-color .25s, color .25s, box-shadow .3s; }
+.gw-go span { transition: translate .35s var(--spring); }
+@media (hover: hover) and (pointer: fine) { .gw-go:hover { background: var(--sun); color: var(--ink); } .gw-go:hover span { translate: 4px 0; } }
+.gw-go:focus-visible { outline: 3px solid var(--rose-ink); outline-offset: 3px; }
+.gw-fine { flex: 1; min-width: 150px; font: 600 12.5px/1.35 var(--f-body); color: var(--ink-2); }
+.gw-spark { position: fixed; z-index: 3; width: 8px; height: 8px; pointer-events: none; background: var(--sun); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
+[data-mode='night'] .gw-card { box-shadow: 0 30px 70px -26px rgba(0, 0, 0, .85), 0 0 0 1px rgba(255, 244, 221, .06); }
+@media (max-width: 520px) {
+  .gw-bot { width: 92px; height: 112px; }
+  .gw-card { padding: 18px 16px 16px; border-radius: 22px; }
+  .gw-opt span { font-size: 13.5px; padding: 7px 12px 7px 10px; min-height: 40px; }
+  .gw-go { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) { .gw-float, .gw-bot .bd-arm { animation: none; } }
+/* the bot a touch bigger, with a soft halo so its dark outline still reads against the night sky */
+.gw-bot { width: 136px; height: 164px; }
+.gw-bot::before { content: ''; position: absolute; inset: 4% -30% 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 244, 221, .55), rgba(255, 244, 221, 0)); opacity: 0; transition: opacity .8s; pointer-events: none; }
+[data-mode='night'] .gw-bot::before { opacity: 1; }
+@media (max-width: 520px) { .gw-bot { width: 104px; height: 126px; } }
+/* phones held upright: the town is a short strip, and the sun and moon sat down among the buildings,
+   leaning on the tower. Smaller, and up in the clear corner of sky to the right of the tower. */
+@media (max-aspect-ratio: 3/4) {
+  .ly-sky .sun, .ly-sky .moon { transform-origin: 1290px 175px; }
+  .ly-sky .sun { translate: 140px -60px; scale: .5; }
+  .ly-sky .moon { translate: 140px -55px; scale: .62; }
+  .ly-sky .sky-hint { display: none; }
+  /* the welcome sits up top, so the sky (and the sun or moon) shows below it */
+  .gw.first { place-items: start center; padding-top: max(16px, 4svh); }
+}
+/* phones: a more compact welcome, so the sun or moon shows in the sky beneath it */
+@media (max-width: 520px) {
+  .gw-bot { width: 88px; height: 106px; }
+  .gw-card { padding: 16px 16px 14px; }
+  .gw-h { font-size: 20px; }
+  .gw-row { margin-top: 12px; }
+  .gw-q { margin-bottom: 6px; }
+  .gw-go-row { margin-top: 16px; padding-top: 14px; }
+  .gw-fine { display: none; }
 }
