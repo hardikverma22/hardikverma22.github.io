@@ -525,11 +525,6 @@ export function townMarkup() {
   return { sky: sky(), far: far(), mid: mid(), street: street(), fg: fg() };
 }
 
-// The guide: a small, round companion that greets you, peeks in and walks the road. Drawn to the usual
-// rules for cute characters: a big soft head on a little bean of a body, large glossy eyes set low on the
-// face (two catchlights each), a tiny smile and blush, nub arms and feet, and a sprout on top with a leaf
-// and a small sun bud (Bengaluru is the garden city). Few parts, round shapes, one clear silhouette.
-// Hooks other code relies on: .bd-body, .bd-arm (waves), .bd-eyes (follows the pointer), .blink, .beacon.
 export function buddySvg() {
   // The guide: the little visor robot, made cuter. A big round helmet on a small mint body, short stubby
   // limbs, and a glossy visor with big glowing eyes, a tiny smile and pink cheeks. Flat fills only (it is
