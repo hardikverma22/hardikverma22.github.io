@@ -404,8 +404,29 @@ cam.addEventListener('pointerover', (e) => {
   const b = e.target.closest?.('.bld')?.dataset.id || null;
   $$('.ly-mid .up', cam).forEach((el) => { if ((el.dataset.id || el.dataset.b) !== b) el.classList.remove('up'); });
   if (b) $$(`.ly-mid .bld[data-id="${b}"], .ly-mid .bl[data-b="${b}"]`, cam).forEach((el) => el.classList.add('up'));
+  $$('.pin', cam).forEach((p) => p.classList.toggle('lit', p.dataset.id === b));
 });
-cam.addEventListener('pointerleave', () => $$('.ly-mid .up', cam).forEach((el) => el.classList.remove('up')));
+cam.addEventListener('pointerleave', () => { $$('.ly-mid .up', cam).forEach((el) => el.classList.remove('up')); $$('.pin.lit', cam).forEach((p) => p.classList.remove('lit')); });
+
+// A building tag that would sit on the headline or the buttons (taller screens bring the town up into
+// the copy) steps aside; the building still carries its own sign.
+const heroBits = $$('#hero-copy > *');
+const tuckPins = () => {
+  if (scrollY > 40) return; // the copy drifts away on scroll; measure only where the two can meet
+  const pad = 14;
+  // the ink, not the block: lines of text and the buttons themselves, so a tag right of a short line can stay
+  const boxes = heroBits.flatMap((el) => { const rg = document.createRange(); rg.selectNodeContents(el); return [...rg.getClientRects()]; }).filter((r) => r.width && r.height);
+  $$('.pin', cam).forEach((p) => {
+    p.classList.remove('tucked');
+    const r = p.getBoundingClientRect();
+    p.classList.toggle('tucked', boxes.some((b) => r.left < b.right + pad && r.right > b.left - pad && r.top < b.bottom + pad && r.bottom > b.top - pad));
+  });
+};
+let tuckT = 0;
+const tuckSoon = () => { clearTimeout(tuckT); tuckT = setTimeout(tuckPins, 120); };
+addEventListener('resize', tuckSoon);
+document.fonts?.ready.then(tuckSoon);
+setTimeout(tuckPins, 400);
 cam.addEventListener('click', (e) => {
   const t = e.target.closest('.pin, .bld');
   if (t) openBuilding(t.dataset.id);
@@ -965,7 +986,7 @@ const guideReady = new Promise((ok) => setTimeout(() => {
   };
   if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 0);
 }, 1400));
-const introOver = runIntro({ reduced, gate: prefs.gate, boot: guideReady, onSwap: headline.play, onDone: () => { lenis?.start(); setTimeout(headline.play, 250); } });
+const introOver = runIntro({ reduced, gate: prefs.gate, boot: guideReady, onSwap: headline.play, onDone: () => { lenis?.start(); setTimeout(headline.play, 250); setTimeout(tuckPins, 1600); } });
 // the full scroll refresh is heavy; let it wait until the intro has finished so it can't stall it
 addEventListener('load', () => introOver.then(() => ScrollTrigger.refresh()));
 

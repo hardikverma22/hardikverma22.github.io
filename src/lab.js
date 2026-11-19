@@ -55,9 +55,9 @@ function benchHTML() {
     <div class="bench-row">
       ${lab.map((p, i) => `
       <button class="dev dev-${p.id}" data-case="${p.id}" style="--i:${i}" aria-label="${p.kind}, ${esc(p.name)}: ${esc(p.hook)}. Open the case">
-        <span class="dev-tag" aria-hidden="true"><b>${esc(p.tag[0])}</b><span>→ ${esc(p.tag[1])}</span></span>
         <span class="dev-frame">${devices[p.id]()}</span>
-        <span class="dev-label"><span class="dev-kind dev-kind-${p.kind.toLowerCase()}">${p.kind}</span><b>${esc(p.name)}</b><small>${esc(p.hook)}</small><em>Open the case →</em></span>
+        <span class="dev-label"><span class="dev-kind dev-kind-${p.kind.toLowerCase()}">${p.kind}</span><b>${esc(p.name)}</b><small>${esc(p.hook)}</small></span>
+        <span class="dev-foot"><span class="dev-stat"><b>${esc(p.tag[0])}</b><span>${esc(p.tag[1])}</span></span><em class="dev-go" aria-hidden="true">→</em></span>
       </button>`).join('')}
     </div>
     <div class="bench-top" aria-hidden="true"></div>

@@ -6,7 +6,7 @@ export const lab = [
     full: 'Guided Resolution & Intelligent Diagnosis',
     hook: 'A super agent I built that starts triaging the moment a bug or an incident comes in.',
     pitch: 'Grid is a super agent I built for on-call. It has many front doors: its own chat UI, Slack, Teams and ServiceNow, and a FastAPI webhook registered with Walmart’s internal paging system and Jira, so a page or a ticket reaches Grid the moment it reaches the engineers. Its supervisor reads what came in, plans, hands tasks to five specialist agents, checks whether their findings need more work, then concludes the root cause and how to fix it. By the time an engineer opens the laptop, the groundwork is done, with a summary even a non-technical reader can follow.',
-    tag: ['60–90 min', 'under 5 min'],
+    tag: ['Under 5 min', 'to a root cause, from 60–90'],
     tagNote: 'per incident',
     meta: [['Role', 'Designed and built it, including an MCP server from scratch'], ['Built with', 'Python, FastAPI, LangGraph, MCP, RAG'], ['Used in', 'On-call investigations for bugs and incidents']],
     numbers: [['~80%', 'less time to triage an incident'], ['<5 min', 'to a root cause, down from 60–90 by hand'], ['5', 'specialist agents, run in sequence or in parallel'], ['1', 'supervisor that plans, delegates, re-checks and concludes']],
