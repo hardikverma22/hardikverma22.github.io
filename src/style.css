@@ -2255,7 +2255,7 @@ html.intro :is(.nudge, .ride, .junction, .route) { visibility: hidden; }
 /* while the intro moves the tags, their own hover/fade transitions stay out of the way (they'd chase every frame) */
 .intro :is(.pin, .pin-tag) { transition: none !important; }
 
-/* ---------------- the welcome (prefs.js): the guide bot asks two things in the open sky ----------------
+/* ---------------- the welcome (prefs.js): a card asks two things in the open sky ----------------
    The sky behind it is the real hero sky (the town is still hidden), so picking day or night shows at once. */
 @property --gw-veil { syntax: '<number>'; inherits: true; initial-value: 1; }
 .tix-open, .tix-open body { overflow: hidden; }
@@ -2263,23 +2263,9 @@ html.intro :is(.nudge, .ride, .junction, .route) { visibility: hidden; }
   background: radial-gradient(90% 70% at 50% 45%, transparent 30%, rgba(12, 10, 34, calc(.38 * var(--gw-veil))) 100%); }
 .gw:not(.first) { background: color-mix(in srgb, var(--ink) calc(38% * var(--gw-veil)), transparent); backdrop-filter: blur(calc(6px * var(--gw-veil))); }
 .gw-wrap { position: relative; display: grid; justify-items: center; width: min(470px, 100%); }
-.gw-bot { position: relative; z-index: 2; width: 116px; height: 140px; margin-bottom: -6px; }
-.gw-bot-in, .gw-float { position: absolute; inset: 0; }
-.gw-float { animation: gwfloat 2.8s ease-in-out infinite; }
-.gw-bot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.gw-bot .bd-arm { animation: wave 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 0 100%; }
-.gw-happy { opacity: 0; }
-.gw-happy path { fill: none; stroke: #7dffb0; stroke-width: 2.8; stroke-linecap: round; filter: drop-shadow(0 0 3px #7dffb0); }
-.gw-bot.happy .bd-eyes { opacity: 0; }
-.gw-bot.happy .gw-happy { opacity: 1; }
-@keyframes gwfloat { 50% { translate: 0 -8px; } }
 
 .gw-card { position: relative; width: 100%; padding: 22px 24px 20px; background: #fffaf0; color: var(--ink); border: 2px solid var(--ink); border-radius: 26px;
   box-shadow: 0 30px 60px -28px rgba(10, 8, 30, .6), 0 2px 0 rgba(33, 28, 51, .08); }
-/* the bubble's tail points up at the bot */
-.gw-card::before, .gw-card::after { content: ''; position: absolute; left: 50%; translate: -50% 0; width: 0; height: 0; border-style: solid; }
-.gw-card::before { bottom: 100%; border-width: 0 13px 15px; border-color: transparent transparent var(--ink); }
-.gw-card::after { bottom: calc(100% - 3px); border-width: 0 10px 12px; border-color: transparent transparent #fffaf0; }
 .gw-hi { margin: 0; font-size: 26px; line-height: 1; color: var(--rose-ink); rotate: -2deg; }
 .gw-h { margin: 8px 0 4px; font: 800 clamp(21px, 2.6vw, 25px)/1.15 var(--f-display); font-variation-settings: 'SOFT' 100, 'WONK' 1; letter-spacing: -.012em; text-wrap: balance; }
 .gw-row { margin: 16px 0 0; padding: 0; border: 0; min-width: 0; }
@@ -2301,20 +2287,12 @@ html.intro :is(.nudge, .ride, .junction, .route) { visibility: hidden; }
 @media (hover: hover) and (pointer: fine) { .gw-go:hover { background: var(--sun); color: var(--ink); } .gw-go:hover span { translate: 4px 0; } }
 .gw-go:focus-visible { outline: 3px solid var(--rose-ink); outline-offset: 3px; }
 .gw-fine { flex: 1; min-width: 150px; font: 600 12.5px/1.35 var(--f-body); color: var(--ink-2); }
-.gw-spark { position: fixed; z-index: 3; width: 8px; height: 8px; pointer-events: none; background: var(--sun); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
 [data-mode='night'] .gw-card { box-shadow: 0 30px 70px -26px rgba(0, 0, 0, .85), 0 0 0 1px rgba(255, 244, 221, .06); }
 @media (max-width: 520px) {
-  .gw-bot { width: 92px; height: 112px; }
   .gw-card { padding: 18px 16px 16px; border-radius: 22px; }
   .gw-opt span { font-size: 13.5px; padding: 7px 12px 7px 10px; min-height: 40px; }
   .gw-go { width: 100%; justify-content: center; }
 }
-@media (prefers-reduced-motion: reduce) { .gw-float, .gw-bot .bd-arm { animation: none; } }
-/* the bot a touch bigger, with a soft halo so its dark outline still reads against the night sky */
-.gw-bot { width: 136px; height: 164px; }
-.gw-bot::before { content: ''; position: absolute; inset: 4% -30% 18%; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 244, 221, .55), rgba(255, 244, 221, 0)); opacity: 0; transition: opacity .8s; pointer-events: none; }
-[data-mode='night'] .gw-bot::before { opacity: 1; }
-@media (max-width: 520px) { .gw-bot { width: 104px; height: 126px; } }
 /* phones held upright: the town is a short strip, and the sun and moon sat down among the buildings,
    leaning on the tower. Smaller, and up in the clear corner of sky to the right of the tower. */
 @media (max-aspect-ratio: 3/4) {
@@ -2327,7 +2305,6 @@ html.intro :is(.nudge, .ride, .junction, .route) { visibility: hidden; }
 }
 /* phones: a more compact welcome, so the sun or moon shows in the sky beneath it */
 @media (max-width: 520px) {
-  .gw-bot { width: 88px; height: 106px; }
   .gw-card { padding: 16px 16px 14px; }
   .gw-h { font-size: 20px; }
   .gw-row { margin-top: 12px; }
@@ -2335,3 +2312,140 @@ html.intro :is(.nudge, .ride, .junction, .route) { visibility: hidden; }
   .gw-go-row { margin-top: 16px; padding-top: 14px; }
   .gw-fine { display: none; }
 }
+
+/* ---------------- calmer town (Nov 2026) ----------------
+   Each building already carries its own sign, so its tag (name and years) only shows while you point at the
+   building or the tag's spot, springing up from the roof. The kite is put away: one thing in the sky
+   (the balloon) is enough. */
+.pin { opacity: 0; transition: opacity .25s var(--out); }
+.pin .pin-tag { translate: 0 8px; scale: .92; transition: translate .45s var(--spring), scale .45s var(--spring), background-color .25s, color .25s, border-color .25s; }
+.pin.lit, .pin:focus-visible { opacity: 1; }
+.pin.lit .pin-tag, .pin:focus-visible .pin-tag { translate: 0 0; scale: 1; }
+@media (hover: hover) and (pointer: fine) { .pin:hover { opacity: 1; } .pin:hover .pin-tag { translate: 0 0; scale: 1; } }
+.bld[data-id='home'] > .dayonly, .flier .dayonly { display: none; }
+/* every building now carries its own sign (the house got one too), so the floating tags are retired.
+   Phones keep the "tap a building" list under the headline. */
+.pins .pin { display: none; }
+.lit.lit-text.sign-s { font-size: 10px; letter-spacing: .05em; }
+
+/* ---------------- journey art (journey-art.js): full city panoramas with small living details ----------------
+   Each scene is right-anchored and as wide as its height allows, so phones see the landmark end. */
+.jr-sky { position: absolute; inset: 0 0 auto 0; height: 70%; pointer-events: none; }
+.jr-sky svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.jr-cities { overflow: hidden; height: 82%; }
+.city { inset: 0; right: 0; height: auto; max-width: none; aspect-ratio: auto; }
+.city svg { position: absolute; right: 0; bottom: 0; height: 100%; width: auto; aspect-ratio: 4; overflow: visible; }
+.city-name { z-index: 2; }
+@media (max-width: 760px) { .city { max-width: none; } }
+
+.ja-sway { animation: jasway 4.2s ease-in-out var(--sd, 0s) infinite alternate; }
+@keyframes jasway { from { rotate: -2.2deg; } to { rotate: 2.2deg; } }
+.ja-flag { animation: jaflag 1.6s ease-in-out infinite alternate; }
+@keyframes jaflag { from { scale: 1 1; } to { scale: .82 1.04; } }
+.ja-waves { animation: jawaves 3.2s linear infinite; }
+@keyframes jawaves { to { translate: 22px 0; } }
+.ja-bob { animation: jabob 2.6s ease-in-out var(--bd, 0s) infinite alternate; }
+@keyframes jabob { from { rotate: -3deg; translate: 0 0; } to { rotate: 3deg; translate: 0 2px; } }
+.ja-ferry { animation: jaferry 46s linear infinite; }
+@keyframes jaferry { from { translate: -120px 0; } to { translate: 1720px 0; } }
+.ja-metro { animation: jametro 16s linear infinite; }
+@keyframes jametro { from { translate: -300px 0; } to { translate: 1700px 0; } }
+.ja-jib { animation: jajib 9s ease-in-out infinite alternate; }
+@keyframes jajib { from { scale: 1 1; } to { scale: .72 1; } }
+.ja-hook { animation: jahook 3s ease-in-out infinite alternate; }
+@keyframes jahook { from { scale: 1 .7; } to { scale: 1 1.1; } }
+.ja-kite { animation: jakite 3.4s ease-in-out infinite alternate; }
+@keyframes jakite { from { rotate: -2deg; } to { rotate: 2.4deg; } }
+.ja-peck { animation: peck 4s ease-in-out var(--pk, 0s) infinite; }
+.ja-smoke circle { transform-box: fill-box; transform-origin: center; animation: puff 4s ease-out infinite; }
+.ja-fly { animation: jafly var(--fd, 40s) linear var(--fdl, 0s) infinite; }
+@keyframes jafly { from { translate: -200px 0; } to { translate: 1800px -30px; } }
+.ja-glide { animation: jaglide 7s ease-in-out var(--gd, 0s) infinite alternate; }
+@keyframes jaglide { from { translate: -30px 6px; rotate: -4deg; } to { translate: 40px -8px; rotate: 4deg; } }
+.ja-cloud { animation: jacloud var(--cd, 120s) linear var(--cdl, 0s) infinite; }
+@keyframes jacloud { from { translate: -300px 0; } to { translate: 1700px 0; } }
+.ja-petals ellipse { animation: japetal 7s linear var(--pd, 0s) infinite; opacity: 0; }
+@keyframes japetal { 0% { translate: 0 0; rotate: 0deg; opacity: 0; } 10% { opacity: 1; } 100% { translate: 40px 60px; rotate: 360deg; opacity: 0; } }
+.ja-beam { opacity: 0; transform-box: view-box; transform-origin: 1446px 174px; animation: jabeam 6s ease-in-out infinite alternate; transition: opacity .8s; }
+[data-mode='night'] .ja-beam { opacity: .2; }
+@keyframes jabeam { from { rotate: -14deg; } to { rotate: 10deg; } }
+.ja-glow { opacity: 0; transition: opacity .8s; }
+[data-mode='night'] .ja-glow { opacity: .3; }
+.lit.far { fill: #ffe29a; }
+[data-mode='night'] .jr-pin .lit.far { opacity: .75; }
+@media (prefers-reduced-motion: reduce) {
+  .jr-pin [class^='ja-'], .jr-pin [class*=' ja-'], .ja-smoke circle, .ja-petals ellipse { animation: none !important; }
+  .ja-ferry { translate: 1100px 0; } .ja-metro { translate: 300px 0; }
+}
+.jr-cities { bottom: 200px; height: 78%; }
+@media (max-width: 760px) { .jr-cities { bottom: 170px; } }
+/* more life: balloons, a Ferris wheel, a plane, a cow, glinting glass, the journey's own sun and moon */
+.ja-float { animation: jafloat 7s ease-in-out var(--fl, 0s) infinite alternate; }
+@keyframes jafloat { from { translate: 0 0; } 50% { translate: 14px -10px; } to { translate: 26px 6px; } }
+.ja-wheel { animation: spin 40s linear infinite; }
+.ja-gondola { animation: spin 40s linear infinite reverse; }
+.ja-tail { animation: tail 1.8s ease-in-out infinite alternate; }
+.ja-graze { animation: jagraze 5s ease-in-out infinite; }
+@keyframes jagraze { 0%, 30%, 100% { rotate: 0deg; } 45%, 80% { rotate: 22deg; } }
+.ja-glint { animation: jaglint 5s ease-in-out infinite; }
+@keyframes jaglint { 0%, 50% { translate: 0 0; } 85%, 100% { translate: 190px 0; } }
+.ja-plane { animation: japlane 30s linear -8s infinite; }
+@keyframes japlane { from { translate: -200px 40px; } to { translate: 1800px -30px; } }
+.ja-rays { animation: spin 50s linear infinite; }
+.ja-sun { transition: opacity .8s, translate 1.4s var(--out); }
+.ja-moon { opacity: 0; translate: 0 40px; transition: opacity .8s, translate 1.4s var(--out); }
+[data-mode='night'] .ja-sun, [data-mode='dusk'] .ja-sun { opacity: 0; translate: 0 60px; }
+[data-mode='night'] .ja-moon { opacity: 1; translate: 0 0; }
+.ja-cloud > g { animation: jacbob 6s ease-in-out infinite alternate; }
+@keyframes jacbob { to { translate: 0 6px; } }
+@media (prefers-reduced-motion: reduce) { .ja-wheel, .ja-gondola, .ja-rays, .ja-cloud > g { animation: none !important; } }
+.jr-sky svg { position: absolute; left: 50%; top: 0; translate: -50% 0; width: max(100%, 1100px); height: auto; aspect-ratio: 4; }
+/* journey layers: colour tokens per plane (far → near), haze, window tint, sea */
+.jr-pin { --jl1: #cfe1f0; --jl2: #aac6df; --jl3: #7f9fc2; --jl4: #4f7192; --jlh: #eef6fc; --jlw: rgba(255, 255, 255, .38); --jlb: rgba(214, 90, 74, .55); --jls: #9fd3ea; }
+[data-mode='dusk'] .jr-pin { --jl1: #f0c3b8; --jl2: #d99fa2; --jl3: #a8789a; --jl4: #6c4f7a; --jlh: #ffe2cf; --jlw: rgba(255, 236, 214, .4); --jls: #f2b0a0; }
+[data-mode='night'] .jr-pin { --jl1: #2f3168; --jl2: #26285a; --jl3: #1d1e4a; --jl4: #141536; --jlh: #3b3474; --jlw: rgba(255, 244, 221, .08); --jlb: rgba(160, 70, 90, .35); --jls: #2a3a6e; }
+.ja-mist { animation: jamist 26s ease-in-out infinite alternate; }
+@keyframes jamist { to { translate: 120px 0; } }
+.ja-breathe { animation: jabreathe 6s ease-in-out var(--sd, 0s) infinite alternate; }
+@keyframes jabreathe { from { rotate: -1.6deg; scale: 1 1; } to { rotate: 1.8deg; scale: 1.02 .98; } }
+.ja-shimmer path { animation: jashim 3.2s ease-in-out infinite; }
+@keyframes jashim { 0%, 100% { opacity: 0; translate: -6px 0; } 50% { opacity: .85; translate: 6px 0; } }
+.ja-halo { transform-box: fill-box; transform-origin: center; animation: jahalo 5s ease-in-out infinite alternate; }
+@keyframes jahalo { to { scale: 1.15; opacity: .8; } }
+[data-mode='night'] .ja-beam { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .ja-mist, .ja-breathe, .ja-shimmer path, .ja-halo { animation: none !important; } .ja-shimmer path { opacity: .6; } }
+/* journey night: one tint dims the coloured scene; lights sit above it */
+.jr-pin { --jl1: #d4e6f3; --jl2: #b4cfe5; --jlh: #eef6fc; --jlw: rgba(255, 255, 255, .4); }
+[data-mode='dusk'] .jr-pin { --jl1: #f0c9bd; --jl2: #dfaaa8; --jlh: #ffe6d6; --jlw: rgba(255, 236, 214, .45); }
+[data-mode='night'] .jr-pin { --jl1: #6f6cb0; --jl2: #5c5aa0; --jlh: #8d80c8; --jlw: rgba(255, 244, 221, .12); }
+.ja-tint { fill: #1b1850; mix-blend-mode: multiply; opacity: 0; transition: opacity 1.2s ease; pointer-events: none; }
+[data-mode='dusk'] .ja-tint { opacity: .22; }
+[data-mode='night'] .ja-tint { opacity: .62; }
+.ja-hglow { mix-blend-mode: screen; opacity: 0; transition: opacity 1.6s ease .4s; }
+[data-mode='dusk'] .ja-hglow { opacity: .35; }
+[data-mode='night'] .ja-hglow { opacity: .55; }
+.ja-bulb { fill: #ffe7a3; opacity: 0; transition: opacity .5s ease calc(var(--wd, 0s) * .3); }
+[data-mode='night'] .ja-bulb { opacity: 1; transition: opacity .6s ease calc(var(--wd, 0s) + .6s); animation: jabulb 2.6s ease-in-out var(--bd, 0s) infinite alternate; filter: drop-shadow(0 0 2px rgba(255, 210, 120, .9)); }
+@keyframes jabulb { to { fill: #fff6d8; fill-opacity: .55; } }
+.ja-refl { opacity: 0; transition: opacity .8s; }
+[data-mode='night'] .ja-refl { opacity: .7; animation: jarefl 2.4s ease-in-out var(--rd, 0s) infinite alternate; }
+@keyframes jarefl { from { scale: 1 .7; translate: -1px 0; } to { scale: 1 1.15; translate: 1px 2px; } }
+.jr-pin .ja-refl { transform-box: fill-box; transform-origin: 50% 0; }
+[data-mode='night'] .jr-pin .ja-shimmer path { stroke: #ffe7a3; }
+@media (prefers-reduced-motion: reduce) { [data-mode='night'] .ja-bulb, [data-mode='night'] .ja-refl { animation: none; } }
+.jr-hills { transition: filter 1.2s ease; }
+[data-mode='night'] .jr-hills { filter: brightness(.62) saturate(.75) hue-rotate(-8deg); }
+[data-mode='dusk'] .jr-hills { filter: brightness(.88) saturate(.9); }
+/* night dims each coloured building on its own, so lights drawn after it sit on it and nothing behind shows through */
+.ja-dim { transition: filter 1.2s ease; }
+[data-mode='dusk'] .ja-dim { filter: brightness(.86) saturate(.95) sepia(.12); }
+[data-mode='night'] .ja-dim { filter: brightness(.42) saturate(.75) hue-rotate(12deg); }
+.city svg { max-width: none; }
+@media (max-width: 760px) { .jr-cities { height: 70%; } }
+[data-mode='night'] .jr-pin { --jl1: #36377a; --jl2: #2a2b63; --jlh: #4a4290; --jlw: rgba(255, 244, 221, .07); }
+[data-mode='night'] .jr-pin { --jlh: #39336f; }
+[data-mode='night'] .ja-hglow { opacity: .28; }
+.ja-metro { animation: jametro 24s linear infinite; }
+@keyframes jametro { from { translate: -820px 0; } to { translate: 1700px 0; } }
+.ja-headbeam { opacity: 0; transition: opacity .8s; }
+[data-mode='night'] .ja-headbeam { opacity: .3; }

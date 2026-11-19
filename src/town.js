@@ -326,6 +326,8 @@ function home() {
     <rect x="1448" y="642" width="46" height="34" rx="2" fill="var(--glass)" ${S}/><path d="M1460 642 v34 M1471 642 v34 M1482 642 v34" stroke="${INK}" stroke-width="1.6" opacity=".55"/>
     <path d="M1444 638 h54" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
     <g transform="translate(1471 676)"><path d="M-20 -6 h40" ${s2(2.4)}/><rect x="-9" y="-19" width="16" height="11" rx="1.5" fill="#2f2d3b" ${s2(1.8)}/><rect x="-7" y="-17" width="12" height="7" rx="1" fill="#9fd0ff"/><path d="M-11 -7 h20" ${s2(2.4)}/><path d="M11 -11 h5 v5 h-5 Z" fill="#fff" ${s2(1.4)}/></g>
+    <!-- its signboard, like the press's, so the house is labelled the way every other building is -->
+    <rect x="1446" y="611" width="100" height="25" rx="4" fill="#fff4e0" ${S}/><text x="1496" y="628.5" text-anchor="middle" class="sign sign-ink sign-s">AFTER HOURS</text>
     <rect x="1508" y="646" width="32" height="54" rx="2" fill="#5a7bd8" ${S}/><path d="M1524 646 v54" stroke="${INK}" stroke-width="1.6" opacity=".4"/><circle cx="1534" cy="674" r="2" fill="#ffd25e"/>
     <path d="M1502 642 h44" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
     <rect x="1504" y="698" width="40" height="5" rx="1.5" fill="#d8cdb8" ${s2(1.8)}/>
@@ -355,6 +357,7 @@ function mid() {
   <g class="lights">
     <defs><linearGradient id="g-beam" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff6cf" stop-opacity="1"/><stop offset=".55" stop-color="#fff6cf" stop-opacity=".35"/><stop offset="1" stop-color="#fff6cf" stop-opacity="0"/></linearGradient></defs>
     <g class="bl" data-b="press"><rect class="lit sign-lit" style="--wd:.8s" x="1244" y="534" width="108" height="26" rx="3"/><text class="lit lit-text" style="--wd:.8s" x="1298" y="553" text-anchor="middle">THE PRESS</text></g>
+    <g class="bl" data-b="home"><rect class="lit sign-lit" style="--wd:.9s" x="1448" y="613" width="96" height="21" rx="3"/><text class="lit lit-text sign-s" style="--wd:.9s" x="1496" y="628.5" text-anchor="middle">AFTER HOURS</text></g>
     <g class="bl" data-b="lab"><text class="lit lit-agent" style="--wd:.3s" x="840" y="596" text-anchor="middle">AGENT LAB</text></g>
     <g class="bl" data-b="tower"><g class="lit wm-lit" style="--wd:.15s"><text x="1102" y="236" text-anchor="middle" class="wm-sign">Walmart</text><g transform="translate(1046 229) scale(.95) translate(-12 -12)">${spark('#ffc220')}</g></g></g>
     <g class="bl" data-b="home">${[[1444, 576], [1454, 579], [1464, 581], [1474, 582], [1484, 582], [1494, 581], [1504, 579], [1514, 577], [1524, 579], [1534, 581], [1544, 579]].map(([x, y], i) => `<circle class="lit fairy" style="--wd:${(1 + i * 0.06).toFixed(2)}s;--fc:${['#ffd66b', '#ff8ab8', '#7dffb0', '#9fd0ff'][i % 4]};--fd:${(i * 0.23).toFixed(2)}s" cx="${x}" cy="${y + 3}" r="3"/>`).join('')}</g>
@@ -522,82 +525,55 @@ export function townMarkup() {
   return { sky: sky(), far: far(), mid: mid(), street: street(), fg: fg() };
 }
 
-// The guide: the companion bot that greets you, peeks in and walks the road. A rounded cream helmet with a
-// glossy visor, capsule eyes with catchlights, a small smile and blush, ear pods, a glowing antenna, a coral
-// body with a chest panel, two arms (the right one waves) and little boots. Flat colours with soft highlight
-// shapes, no gradients, so it can appear many times on a page without clashing ids.
+// The guide: a small, round companion that greets you, peeks in and walks the road. Drawn to the usual
+// rules for cute characters: a big soft head on a little bean of a body, large glossy eyes set low on the
+// face (two catchlights each), a tiny smile and blush, nub arms and feet, and a sprout on top with a leaf
+// and a small sun bud (Bengaluru is the garden city). Few parts, round shapes, one clear silhouette.
 // Hooks other code relies on: .bd-body, .bd-arm (waves), .bd-eyes (follows the pointer), .blink, .beacon.
 export function buddySvg() {
+  // The guide: the little visor robot, made cuter. A big round helmet on a small mint body, short stubby
+  // limbs, and a glossy visor with big glowing eyes, a tiny smile and pink cheeks. Flat fills only (it is
+  // drawn several times on the page, so no gradient ids). Hooks used elsewhere: .bd-body .bd-arm .bd-eyes .blink .beacon
   const o = (w = 2.6) => s2(w);
+  const SHELL = '#fdfaf3', MINT = '#7fdcc4', CORAL = '#ff9c86', VISOR = '#28245a', GLOW = '#8ff3ff';
+  const tube = (d, w = 7) => `<path d="${d}" fill="none" stroke="${INK}" stroke-width="${w}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${MINT}" stroke-width="${w - 4.4}" stroke-linecap="round"/>`;
   return `<svg viewBox="-40 -80 80 96" aria-hidden="true">
-    <ellipse cx="0" cy="12.5" rx="21" ry="3.6" fill="rgba(0,0,0,.18)"/>
+    <ellipse cx="0" cy="12.5" rx="19" ry="3.4" fill="rgba(0,0,0,.16)"/>
     <g class="bd-body">
-    <!-- legs and boots -->
-    <path d="M-7 1 v6 M7 1 v6" ${o(4.2)}/>
-    <path d="M-12.5 11.5 q0 -5.5 5.5 -5.5 h1.5 q3 0 3 3 v2.5 z M12.5 11.5 q0 -5.5 -5.5 -5.5 h-1.5 q-3 0 -3 3 v2.5 z" fill="#3b3656" ${o(2.2)}/>
-    <!-- resting left arm -->
-    <path d="M-15.5 -15 q-8 3 -8.5 12" fill="none" ${o(4)}/><circle cx="-24" cy="-2.5" r="3.4" fill="#fff8e6" ${o(2.2)}/>
-    <!-- body -->
-    <rect x="-17" y="-25" width="34" height="28" rx="11" fill="var(--rose)" ${o()}/>
-    <path d="M-12.5 -19.5 q1 -2.8 4.5 -3" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.2" stroke-linecap="round"/>
-    <path d="M-15 -1.5 q15 5 30 0" fill="none" stroke="rgba(33,28,51,.18)" stroke-width="2.2" stroke-linecap="round"/>
-    <rect x="-8.5" y="-18.5" width="17" height="11.5" rx="3.5" fill="#fff8e6" ${o(2)}/>
-    <circle class="bd-heart" cx="-3" cy="-12.7" r="2.3" fill="var(--sun)" ${o(1.4)}/>
-    <path d="M1.5 -14.5 h4 M1.5 -11 h2.5" ${o(1.6)}/>
-    <!-- waving right arm -->
-    <g class="bd-arm"><path d="M15.5 -15 q10 -3 12.5 -17" fill="none" ${o(4)}/><circle cx="28.5" cy="-33.5" r="3.6" fill="#fff8e6" ${o(2.2)}/></g>
-    <!-- neck -->
-    <rect x="-5" y="-29" width="10" height="5" rx="2" fill="#3b3656"/>
+    <!-- stubby legs and round feet -->
+    ${tube('M-6.5 0 v5')}${tube('M6.5 0 v5')}
+    <ellipse cx="-7.5" cy="9" rx="6.4" ry="3.8" fill="${CORAL}" ${o(2.2)}/><ellipse cx="7.5" cy="9" rx="6.4" ry="3.8" fill="${CORAL}" ${o(2.2)}/>
+    <!-- resting arm -->
+    ${tube('M-14 -14 q-7 3 -7.5 10')}<circle cx="-21.5" cy="-3" r="3.6" fill="${SHELL}" ${o(2.2)}/>
+    <!-- body: a small rounded mint capsule with a cream belly and a glowing heart -->
+    <rect x="-15.5" y="-24" width="31" height="27" rx="12" fill="${MINT}" ${o()}/>
+    <path d="M-11 -18.5 q1.2 -2.6 4.4 -2.9" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2.2" stroke-linecap="round"/>
+    <ellipse cx="0" cy="-8.5" rx="8.4" ry="7.2" fill="${SHELL}" ${o(2)}/>
+    <path class="bd-heart" d="M0 -5.2 c-5 -3 -5.6 -6.4 -3.4 -7.8 c1.6 -1 3 0 3.4 1.2 c.4 -1.2 1.8 -2.2 3.4 -1.2 c2.2 1.4 1.6 4.8 -3.4 7.8 z" fill="${CORAL}" ${o(1.4)}/>
+    <!-- waving arm -->
+    <g class="bd-arm">${tube('M14 -14 q9 -3 11 -15')}<circle cx="25.5" cy="-31" r="3.8" fill="${SHELL}" ${o(2.2)}/></g>
     <!-- ear pods -->
-    <rect x="-28.5" y="-52" width="7" height="13" rx="3.5" fill="var(--sun)" ${o(2.2)}/>
-    <rect x="21.5" y="-52" width="7" height="13" rx="3.5" fill="var(--sun)" ${o(2.2)}/>
-    <!-- helmet -->
-    <rect x="-23" y="-66" width="46" height="39" rx="15" fill="#fff8e6" ${o(2.8)}/>
-    <path d="M-17.5 -58 q2.5 -4.5 8 -5" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
-    <path d="M-20 -33 q20 6 40 0" fill="none" stroke="rgba(33,28,51,.12)" stroke-width="2.4" stroke-linecap="round"/>
-    <!-- visor, with a glassy sheen -->
-    <rect x="-17.5" y="-59.5" width="35" height="25" rx="9.5" fill="#1d1b3c" ${o(2.2)}/>
-    <path d="M-14 -55 l7 -2.2 l-9.5 14 l-2 -3.5 z" fill="#fff" fill-opacity=".14"/>
-    <g class="bd-eyes"><g class="blink">
-      <rect x="-10.5" y="-52" width="6.4" height="9.5" rx="3.2" fill="#7dffb0"/><rect x="4.1" y="-52" width="6.4" height="9.5" rx="3.2" fill="#7dffb0"/>
-      <circle cx="-6" cy="-49.6" r="1.25" fill="#fff"/><circle cx="8.6" cy="-49.6" r="1.25" fill="#fff"/>
-    </g></g>
-    <path d="M-2.6 -39.5 q2.6 2.4 5.2 0" fill="none" stroke="#7dffb0" stroke-width="1.6" stroke-linecap="round"/>
-    <ellipse cx="-12.5" cy="-39.5" rx="2.8" ry="1.6" fill="#ff8fa3" fill-opacity=".6"/><ellipse cx="12.5" cy="-39.5" rx="2.8" ry="1.6" fill="#ff8fa3" fill-opacity=".6"/>
+    <circle cx="-26.5" cy="-46" r="6" fill="${CORAL}" ${o(2.2)}/><circle cx="-26.5" cy="-46" r="2.2" fill="${SHELL}"/>
+    <circle cx="26.5" cy="-46" r="6" fill="${CORAL}" ${o(2.2)}/><circle cx="26.5" cy="-46" r="2.2" fill="${SHELL}"/>
     <!-- antenna -->
-    <path d="M0 -66 v-7" ${o(2.8)}/>
-    <circle cx="0" cy="-76" r="7.5" fill="var(--sun)" fill-opacity=".22"/>
-    <circle class="beacon" cx="0" cy="-76" r="4.2" fill="var(--sun)" ${o(2)}/>
-    <circle cx="-1.3" cy="-77.4" r="1.2" fill="#fff" fill-opacity=".8"/>
+    <path d="M0 -67 v-5.5" ${o(2.6)}/>
+    <circle cx="0" cy="-75" r="7" fill="var(--sun)" fill-opacity=".25"/>
+    <circle class="beacon" cx="0" cy="-75" r="4" fill="var(--sun)" ${o(2)}/>
+    <circle cx="-1.2" cy="-76.3" r="1.1" fill="#fff" fill-opacity=".85"/>
+    <!-- helmet: big and round -->
+    <rect x="-25" y="-68" width="50" height="44" rx="20" fill="${SHELL}" ${o(2.8)}/>
+    <path d="M-17 -60.5 q3 -4.6 9 -5.4" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-21 -30 q21 7 42 0" fill="none" stroke="rgba(33,28,51,.09)" stroke-width="2.6" stroke-linecap="round"/>
+    <!-- visor, with a glassy sheen -->
+    <rect x="-19" y="-61" width="38" height="29" rx="12.5" fill="${VISOR}" ${o(2.2)}/>
+    <path d="M-15 -57 q5 -2.6 11 -2.4" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.4" stroke-linecap="round"/>
+    <g class="bd-eyes"><g class="blink">
+      <ellipse cx="-7.6" cy="-47.5" rx="4.4" ry="5.6" fill="${GLOW}"/><ellipse cx="7.6" cy="-47.5" rx="4.4" ry="5.6" fill="${GLOW}"/>
+      <circle cx="-9" cy="-49.6" r="1.7" fill="#fff"/><circle cx="6.2" cy="-49.6" r="1.7" fill="#fff"/>
+      <circle cx="-6" cy="-45.4" r=".8" fill="#fff"/><circle cx="9.2" cy="-45.4" r=".8" fill="#fff"/>
+    </g></g>
+    <ellipse cx="-13" cy="-39.6" rx="3.2" ry="1.9" fill="#ff8fb1" fill-opacity=".75"/><ellipse cx="13" cy="-39.6" rx="3.2" ry="1.9" fill="#ff8fb1" fill-opacity=".75"/>
+    <path d="M-2.6 -39.8 q2.6 2.6 5.2 0" fill="none" stroke="${GLOW}" stroke-width="1.7" stroke-linecap="round"/>
     </g></svg>`;
 }
 
-// Skylines for the journey section, one per city. 600×240, ground at y=240.
-const SK = 'stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"';
-export const skylines = {
-  Chennai: `<svg viewBox="0 0 600 240" aria-hidden="true">
-    <g fill="#e8c27a" ${SK}><path d="M120 240 V130 H200 V240 Z"/><path d="M126 130 V108 H194 V130 Z" fill="#e07a52"/><path d="M132 108 V88 H188 V108 Z" fill="#7cc4a8"/><path d="M138 88 V70 H182 V88 Z" fill="#f2b134"/><path d="M144 70 V54 H176 V70 Z" fill="#ef6a5b"/><path d="M148 54 Q160 34 172 54 Z" fill="#f2b134"/></g>
-    <g stroke="var(--ink)" stroke-width="1.6">${[0, 1, 2, 3].map((r) => [0, 1, 2, 3, 4].map((c) => `<rect x="${130 + c * 13}" y="${140 + r * 22}" width="6" height="10" fill="#c98f4a"/>`).join('')).join('')}</g>
-    <path d="M150 240 V214 Q160 200 170 214 V240 Z" fill="#7a4a2a" ${SK}/>
-    <g ${SK}><path d="M420 240 L428 90 H452 L460 240 Z" fill="#fff"/><path d="M425 150 H455 M424 190 H457" stroke="#ef6a5b" stroke-width="12"/><path d="M422 92 H458 V78 H422 Z" fill="#2f2d3b"/><path d="M428 78 V64 H452 V78" fill="#ffe9a8"/><path d="M426 64 L440 52 L454 64 Z" fill="#ef6a5b"/></g>
-    ${[40, 260, 330, 540].map((x, i) => `<g transform="translate(${x} 240)"><path d="M0 0 Q4 -50 -2 -96" fill="none" stroke="#7a4a2a" stroke-width="6" stroke-linecap="round"/><path d="M-2 -96 q-30 -2 -42 14 q22 -14 42 -14 q-18 -24 -40 -22 q26 2 40 22 q10 -24 34 -26 q-22 10 -34 26 q30 -6 44 10 q-28 -8 -44 -10Z" fill="var(--leaf-2)" ${SK}/></g>`).join('')}
-    <path d="M220 240 V196 H300 V240 Z M310 240 V176 H370 V240 Z" fill="var(--city-far)"/>
-  </svg>`,
-  Stockholm: `<svg viewBox="0 0 600 240" aria-hidden="true">
-    <g ${SK}>${[['#e2a33b', 60], ['#c2593a', 104], ['#f2d27a', 148], ['#7a9e6f', 192], ['#e07a52', 236], ['#f4e7d3', 280], ['#b0473a', 324]].map(([c, x], i) => {
-      const h = 110 + ((i * 37) % 50);
-      return `<path d="M${x} 228 V${228 - h} l22 -22 l22 22 V228 Z" fill="${c}"/>` + [0, 1, 2].map((r) => `<rect x="${x + 8}" y="${228 - h + 14 + r * 30}" width="10" height="16" fill="var(--glass)" stroke="var(--ink)" stroke-width="1.6"/><rect x="${x + 26}" y="${228 - h + 14 + r * 30}" width="10" height="16" fill="var(--glass)" stroke="var(--ink)" stroke-width="1.6"/>`).join('');
-    }).join('')}
-    <path d="M420 228 V120 H470 V228 Z" fill="#b0473a"/><path d="M426 120 L445 20 L464 120 Z" fill="#3b3750"/><path d="M432 92 h26 M436 70 h18 M439 50 h12" stroke="#8a84a0" stroke-width="2"/><path d="M445 20 v-12" /></g>
-    <rect x="0" y="226" width="600" height="14" fill="#7fb2d8"/><path d="M0 232 q20 -4 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>
-    <g transform="translate(510 226)"><path d="M-30 0 h60 l-8 10 h-44 Z" fill="#fff4e0" ${SK}/><path d="M-6 0 v-26 l20 22 Z" fill="#fff" ${SK}/></g>
-  </svg>`,
-  Bengaluru: `<svg viewBox="0 0 600 240" aria-hidden="true">
-    <g ${SK}><path d="M60 240 V60 H120 V240 Z" fill="#9fc3ea"/><path d="M130 240 V96 H180 V240 Z" fill="#b5d3f2"/><path d="M470 240 V40 H530 V240 Z" fill="#9fc3ea"/><path d="M540 240 V110 H580 V240 Z" fill="#b5d3f2"/></g>
-    <g stroke="#7aa2d0" stroke-width="2">${[60, 130, 470, 540].map((x) => Array.from({ length: 8 }, (_, r) => `<path d="M${x + 4} ${70 + r * 22} h${x === 60 || x === 470 ? 52 : 42}"/>`).join('')).join('')}</g>
-    <g ${SK}><path d="M210 240 V170 H390 V240 Z" fill="#efe3c8"/><path d="M200 170 H400 V158 H200 Z" fill="#e2d1b0"/><path d="M250 158 V128 H350 V158 Z" fill="#efe3c8"/><path d="M262 128 A38 38 0 0 1 338 128 Z" fill="#e8d6a8"/><path d="M300 90 v-14" /><circle cx="300" cy="74" r="4" fill="#f2b134"/></g>
-    <g stroke="var(--ink)" stroke-width="1.8">${Array.from({ length: 9 }, (_, i) => `<rect x="${222 + i * 19}" y="180" width="8" height="44" fill="#fff8e6"/>`).join('')}</g>
-    <rect x="0" y="198" width="600" height="10" fill="#8a84a0" ${SK}/>${[30, 200, 420, 580].map((x) => `<rect x="${x}" y="208" width="10" height="32" fill="#8a84a0" ${SK}/>`).join('')}
-    <g class="metro"><rect x="0" y="180" width="150" height="18" rx="6" fill="#8b4fc4" ${SK}/>${[0, 1, 2, 3, 4].map((i) => `<rect x="${10 + i * 27}" y="184" width="16" height="8" rx="2" fill="var(--glass)" stroke="var(--ink)" stroke-width="1.4"/>`).join('')}</g>
-  </svg>`,
-};

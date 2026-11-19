@@ -100,8 +100,7 @@ export function runIntro({ reduced, onDone, onSwap, gate = Promise.resolve(), bo
     if (hello) gsap.set(hello, { clipPath: 'inset(-20% 100% -40% 0)' });
     if (h1) gsap.set(h1, { y: 34, autoAlpha: 0, filter: 'blur(14px)' });
     gsap.set(rest, { y: 28, autoAlpha: 0 });
-    // the tag's position comes from a CSS translate on .pin, so only its opacity animates; the pop is on the tag inside
-    gsap.set(pins, { autoAlpha: 0 }); gsap.set(tags, { scale: 0.4, y: 14, transformOrigin: '50% 100%' });
+    // the building tags stay hidden until a building is hovered (style.css), so the intro leaves them alone
     gsap.set(extras, { autoAlpha: 0 }); // some carry CSS translate/rotate of their own: fade only
     if (bar) gsap.set(bar, { autoAlpha: 0, y: -18 });
     root.classList.remove('intro-hide');
@@ -132,9 +131,7 @@ export function runIntro({ reduced, onDone, onSwap, gate = Promise.resolve(), bo
     tl.call(() => onSwap?.(), null, 1.45)
       .to(rest, { y: 0, autoAlpha: 1, stagger: 0.08, duration: 0.8, ease: 'power3.out' }, 0.85);
     if (bar) tl.to(bar, { y: 0, autoAlpha: 1, duration: 0.7, ease: 'power3.out' }, 1);
-    tl.to(pins, { autoAlpha: 1, stagger: 0.07, duration: 0.3, ease: 'power1.out' }, 1.3)
-      .to(tags, { scale: 1, y: 0, stagger: 0.07, duration: 0.7, ease: 'back.out(2.4)' }, 1.3)
-      .to(extras, { autoAlpha: 1, stagger: 0.06, duration: 0.6, ease: 'power2.out' }, 1.5)
+    tl.to(extras, { autoAlpha: 1, stagger: 0.06, duration: 0.6, ease: 'power2.out' }, 1.5)
       .to({}, { duration: 0.2 });
 
     function cleanup() {

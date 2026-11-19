@@ -4,7 +4,8 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { skillsBuilt, markets, writing, testimonials, projects, toolbox, toolboxGroups, awards, identity } from './data.js';
 import { buildings, story, stickies, milestones, tiffin } from './world.js';
-import { townMarkup, agentCar, skylines } from './town.js';
+import { townMarkup, agentCar } from './town.js';
+import { journeyScenes, journeySky, journeyHills } from './journey-art.js';
 import { mark } from './marks.js';
 import { initGuide } from './guide.js';
 import { initNudge } from './nudge.js';
@@ -504,14 +505,9 @@ const AUTO_BODY = 82 / 240; // where the auto's body sits within its svg box
 $('#jr-track').innerHTML = milestones.map((m, i) => `<div class="stone" data-i="${i}"><div class="stone-b"><div class="stone-top">${esc(m.place)}</div><div class="stone-y">${m.y}</div>${mark(m.co, 'stone-mk')}</div></div>`).join('');
 // one skyline per city; they cross-fade as the auto arrives somewhere new
 const cities = [...new Set(milestones.map((m) => m.place))];
-$('#jr-cities').innerHTML = cities.map((c) => `<div class="city" data-city="${c}">${skylines[c] || ''}</div>`).join('') + '<span class="city-name hand" id="city-name"></span>';
-(() => {
-  let d = 'M0 260 ', trees = '';
-  for (let x = 0; x <= 6000; x += 200) d += `Q${x + 100} ${200 + ((x / 200) % 3) * 30} ${x + 200} 240 `;
-  d += 'V400 H0 Z';
-  for (let x = 60; x < 6000; x += 130 + ((x * 7) % 90)) trees += `<g transform="translate(${x} ${238 - ((x / 13) % 18)})"><path d="M0 0 v-20" stroke="var(--ink)" stroke-width="4"/><circle cy="-34" r="${16 + ((x / 5) % 8)}" fill="var(--leaf-1)" stroke="var(--ink)" stroke-width="3"/></g>`;
-  $('#jr-hills').innerHTML = `<svg viewBox="0 0 6000 400" preserveAspectRatio="none"><path d="${d}" fill="var(--hill-near)" stroke="var(--ink)" stroke-width="3"/>${trees}</svg>`;
-})();
+$('#jr-cities').innerHTML = cities.map((c) => `<div class="city" data-city="${c}">${journeyScenes[c] || ''}</div>`).join('') + '<span class="city-name hand" id="city-name"></span>';
+$('#jr-pin').insertAdjacentHTML('afterbegin', `<div class="jr-sky" aria-hidden="true">${journeySky()}</div>`);
+$('#jr-hills').innerHTML = journeyHills();
 // progress strip: one dot per stop, coloured by company
 const coColour = { tcs: '#EE3984', hm: '#E50010', fidelity: '#368727', walmart: '#0071CE', home: '#ef6a5b' };
 $('#jr-meter').innerHTML = `<span class="jm-y" id="jm-y"></span><span class="jm-dots">${milestones.map((m, i) => `<i style="--c:${coColour[m.co]}" data-i="${i}"></i>`).join('')}</span>`;
