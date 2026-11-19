@@ -1021,7 +1021,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @keyframes fairy { from { fill-opacity: 1; } to { fill-opacity: .35; } }
 
 /* bots' eyes glow, lamps and headlights brighter */
-[data-mode='night'] .bot-bob .blink circle, [data-mode='night'] .bd-eyes circle { filter: drop-shadow(0 0 3px #7dffb0); }
+[data-mode='night'] .bot-bob .blink circle, [data-mode='night'] .bd-eyes rect { filter: drop-shadow(0 0 3px #7dffb0); }
 .lamp .cone { --to: .4; } .lamp .pool { --to: .6; }
 [data-mode='night'] .lamp .bulb { filter: drop-shadow(0 0 8px #ffe9a8); }
 [data-mode='night'] .hl { opacity: .65; }
@@ -1980,38 +1980,6 @@ html.has-cur input, html.has-cur textarea, html.has-cur select, html.has-cur [co
 @media (prefers-reduced-motion: reduce) { .balloon { animation: none; left: 30%; } .bl-bob, .bl-badge { animation: none !important; } }
 
 
-/* ---------------- intro (intro.js): the town draws itself, then colour washes up ----------------
-   Built to stay smooth: the line drawing is a static copy of the town, revealed by a paper "eraser" that
-   slides off it, and the colour comes up as the whole cover wipes away. Only transforms animate. */
-:root { --sketch: #211c33; }
-[data-mode='night'] { --sketch: #f3ecdf; }
-/* before the cover is in place, the finished town must not show */
-.sketch:not(.cover-ready) .stage { background: var(--paper); }
-.sketch:not(.cover-ready) .stage > :not(.hero-copy) { visibility: hidden; }
-/* the cover: plain paper, the line drawing on it, and the eraser that reveals the drawing */
-/* the cover reaches 140px below the screen, where its soft lower edge waits out of sight; as it wipes up,
-   that edge is what passes over the town, so the colour rises like a wash rather than a hard line */
-.intro-cover { position: absolute; inset: 0 0 -140px; z-index: 4; overflow: hidden; pointer-events: none; will-change: transform;
-  -webkit-mask: linear-gradient(to top, transparent 0, #000 130px); mask: linear-gradient(to top, transparent 0, #000 130px); }
-.intro-cover-in { bottom: 140px !important; }
-.intro-cover-in { position: absolute; inset: 0; will-change: transform; background: var(--paper); }
-.intro-sketch .scene { pointer-events: none; }
-.intro-sketch * { animation: none !important; transition: none !important; }
-.intro-sketch :is(.lights, defs, .tint, .sunwash, .side-shade, .contact-shadows, .dayonly, .nightonly, .pins, .tap-hint, .fx-town) { display: none !important; }
-.intro-sketch :is(path, rect, circle, ellipse, line, polyline, polygon, text) { fill: none !important; stroke: var(--sketch) !important; stroke-width: 1.25px !important; vector-effect: non-scaling-stroke; stroke-dasharray: none !important; opacity: 1 !important; }
-/* the eraser's soft leading edge starts off-screen, so nothing of the drawing shows until the sweep begins */
-.intro-eraser { position: absolute; inset: 0 -160px 0 -150px; will-change: transform; background: linear-gradient(90deg, transparent 0, var(--paper) 140px); }
-/* the copy, tags and top bar wait for the colour */
-.intro-hide :is(.hero-copy > :not(.hello, .h1), .town-dir, .balloon-lane, #top-bar, .fly-cue, .tap-hint, .pin) { opacity: 0; }
-/* until the town has been drawn and coloured in, nothing else shows and the page stays put */
-html.intro, html.intro body { overflow: hidden; }
-html.intro :is(.nudge, .ride, .junction, .route) { visibility: hidden; }
-.intro-hide .hello { clip-path: inset(-20% 100% -40% 0); }
-/* the headline is inked in as outlines first, then filled as the colour arrives */
-.sketch:not(.wash) .h1, .sketch:not(.wash) .h1 * { color: transparent; -webkit-text-stroke: 1.3px var(--sketch); }
-.sketch.wash .h1, .sketch.wash .h1 * { -webkit-text-stroke: 1.3px transparent; transition: color .9s ease, -webkit-text-stroke-color .9s ease; }
-.intro-hide .h1 { clip-path: inset(-20% 100% -30% 0); }
-.sketch:not(.wash) .fix-strike { opacity: 0; }
 
 /* the play badge on the balloon's band: pulses until the music has been played once, then shows pause */
 .bl-badge { transform-box: fill-box; transform-origin: center; }
@@ -2134,66 +2102,350 @@ section.idle, section.idle *, section.idle *::before, section.idle *::after { an
 [data-mode='night'] .mu-t { background: #fff4dd; color: var(--ink); }
 .foot-ticket { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 
-/* ---------------- the entry ticket (prefs.js) ---------------- */
-.tix-open, .tix-open body { overflow: hidden; }
-.tix-scene { position: fixed; inset: 0; z-index: 200; perspective: 1000px; display: grid; place-items: center; padding: 20px 16px; overflow: auto; }
-/* reopened over the page: the town steps back behind a soft scrim */
-/* on arrival the ticket sits under a soft light on a dark stage, so the paper and its tear stand out;
-   tearing it lifts the stage to the blank sheet the town is drawn on */
-.tix-scene.first { background: radial-gradient(120% 85% at 50% 42%, #3d3656 0%, #262038 55%, #18142a 100%); }
-.tix-scene.first .tix { filter: drop-shadow(0 26px 40px rgba(0, 0, 0, .55)) drop-shadow(0 2px 0 rgba(0, 0, 0, .25)); }
-.tix-scene:not(.first) { background: color-mix(in srgb, var(--ink) 38%, transparent); backdrop-filter: blur(6px); }
-.tix { --tk-paper: #fffaf0; --tk-ink: var(--ink); position: relative; display: grid; grid-template-columns: 1fr 132px; width: min(680px, 100%); color: var(--tk-ink); rotate: -1.2deg; filter: drop-shadow(0 18px 30px rgba(33, 28, 51, .22)) drop-shadow(0 2px 0 rgba(33, 28, 51, .12)); }
-.tix-main, .tix-stub { background: var(--tk-paper); border: 2px solid var(--tk-ink); }
-/* the notches where ticket and stub meet are cut from both pieces */
-.tix-main { position: relative; padding: 26px 28px 22px; border-right: 0; border-radius: 18px 0 0 18px;
-  -webkit-mask: radial-gradient(circle 13px at 100% 0, #0000 98%, #000) top right / 100% 51% no-repeat, radial-gradient(circle 13px at 100% 100%, #0000 98%, #000) bottom right / 100% 51% no-repeat;
-          mask: radial-gradient(circle 13px at 100% 0, #0000 98%, #000) top right / 100% 51% no-repeat, radial-gradient(circle 13px at 100% 100%, #0000 98%, #000) bottom right / 100% 51% no-repeat; }
-.tix-stub { position: relative; display: grid; place-items: center; padding: 0; border-left: 2.5px dashed var(--tk-ink); border-radius: 0 18px 18px 0; cursor: grab; touch-action: none; transform-origin: 0 0; font: inherit; color: inherit;
-  -webkit-mask: radial-gradient(circle 13px at 0 0, #0000 98%, #000) top left / 100% 51% no-repeat, radial-gradient(circle 13px at 0 100%, #0000 98%, #000) bottom left / 100% 51% no-repeat;
-          mask: radial-gradient(circle 13px at 0 0, #0000 98%, #000) top left / 100% 51% no-repeat, radial-gradient(circle 13px at 0 100%, #0000 98%, #000) bottom left / 100% 51% no-repeat;
-  background-image: repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--sun) 35%, transparent) 10px 20px); }
-.tix-stub.held { cursor: grabbing; }
-.tix-stub:focus-visible { outline: 3px solid var(--rose-ink); outline-offset: -8px; }
-.tix-stub-in { display: grid; justify-items: center; gap: 6px; padding: 18px 10px; text-align: center; }
-.tix-stub b { font: 800 28px/1 var(--f-display); font-variation-settings: 'SOFT' 100, 'WONK' 1; letter-spacing: -.02em; }
-.tix-stub small { font: 600 18px/1 var(--f-hand); color: var(--rose-ink); }
-.tix-stub svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; animation: tknudge 1.8s var(--out) 1.4s infinite; }
-@keyframes tknudge { 0%, 60%, 100% { translate: 0 0; } 30% { translate: 0 5px; } }
-.tix-no { margin-top: 10px; font: 700 11px var(--f-mono); letter-spacing: .08em; opacity: .7; }
-.tix-k { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; margin: 0; font: 700 11px var(--f-mono); text-transform: uppercase; letter-spacing: .1em; color: var(--rose-ink); }
-.tix-h { margin: 12px 0 18px; font: 800 clamp(24px, 3.4vw, 32px)/1.08 var(--f-display); font-variation-settings: 'SOFT' 100, 'WONK' 1; letter-spacing: -.015em; text-wrap: balance; }
-.tix-row { display: grid; grid-template-columns: 64px 1fr; align-items: center; gap: 10px; margin: 0 0 12px; padding: 12px 0 0; border: 0; border-top: 1.5px dashed color-mix(in srgb, var(--tk-ink) 30%, transparent); }
-.tix-row legend { float: left; padding: 0; font: 700 12px var(--f-body); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
-.tix-opts { display: flex; flex-wrap: wrap; gap: 8px; }
-.tix-opt { position: relative; cursor: pointer; }
-.tix-opt input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
-.tix-opt span { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 7px 14px 7px 11px; border-radius: 999px; border: 2px solid var(--tk-ink); background: transparent; font: 700 14px var(--f-body);
-  transition: background-color .18s var(--out), color .18s var(--out), box-shadow .18s var(--out), translate .18s var(--out); }
-.tix-opt svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-.tix-opt input:checked + span { background: var(--sun); box-shadow: 2px 2px 0 var(--tk-ink); translate: -1px -1px; }
-.tix-opt input:focus-visible + span { outline: 3px solid var(--rose-ink); outline-offset: 2px; }
-.tix-opt:active span { scale: .96; }
-@media (hover: hover) and (pointer: fine) { .tix-opt:hover input:not(:checked) + span { background: color-mix(in srgb, var(--sun) 30%, transparent); } }
-.tix-fine { margin: 6px 0 0; font: 600 13px var(--f-body); color: var(--ink-2); }
-/* night: the ticket stays paper, but warmer, under the dark sky */
-[data-mode='night'] .tix { --tk-paper: #fff4dd; filter: drop-shadow(0 18px 40px rgba(0, 0, 0, .5)); }
-/* phones: the stub sits below, torn off downwards along a horizontal perforation */
-@media (max-width: 600px) {
-  .tix { grid-template-columns: 1fr; rotate: -.6deg; }
-  .tix-main { padding: 22px 18px 18px; border-right: 2px solid var(--tk-ink); border-bottom: 0; border-radius: 18px 18px 0 0;
-    -webkit-mask: radial-gradient(circle 13px at 0 100%, #0000 98%, #000) bottom left / 51% 100% no-repeat, radial-gradient(circle 13px at 100% 100%, #0000 98%, #000) bottom right / 51% 100% no-repeat;
-            mask: radial-gradient(circle 13px at 0 100%, #0000 98%, #000) bottom left / 51% 100% no-repeat, radial-gradient(circle 13px at 100% 100%, #0000 98%, #000) bottom right / 51% 100% no-repeat; }
-  .tix-stub { border-left: 2px solid var(--tk-ink); border-top: 2.5px dashed var(--tk-ink); border-radius: 0 0 18px 18px;
-    -webkit-mask: radial-gradient(circle 13px at 0 0, #0000 98%, #000) top left / 51% 100% no-repeat, radial-gradient(circle 13px at 100% 0, #0000 98%, #000) top right / 51% 100% no-repeat;
-            mask: radial-gradient(circle 13px at 0 0, #0000 98%, #000) top left / 51% 100% no-repeat, radial-gradient(circle 13px at 100% 0, #0000 98%, #000) top right / 51% 100% no-repeat; }
-  .tix-stub-in { grid-template-columns: auto auto auto; align-items: center; gap: 12px; padding: 14px 12px; }
-  .tix-no { margin: 0; }
-  .tix-row { grid-template-columns: 1fr; gap: 8px; }
-  .tix-opt span { font-size: 13.5px; padding: 6px 12px 6px 9px; }
-}
-@media (prefers-reduced-motion: reduce) { .tix-stub svg { animation: none; } .tix-opt span { transition: none; } }
 
-/* the tear (prefs.js): the peeling stub lifts off the page and fibres fly */
-.tix-stub { will-change: transform; }
-.tix-fibre { position: fixed; z-index: 2; width: var(--s); height: calc(var(--s) * .6); background: var(--tk-paper, #fffaf0); border: 1px solid color-mix(in srgb, var(--ink) 55%, transparent); clip-path: polygon(0 40%, 35% 0, 100% 30%, 80% 100%, 20% 85%); pointer-events: none; }
+/* =====================================================================
+   Polish pass (Nov 2026): one chrome style for every floating control, calmer building tags,
+   and a night palette that stays the same indigo from the sky down to the footer.
+   ===================================================================== */
+:root {
+  --chrome-bg: color-mix(in srgb, #fffaf0 92%, transparent);
+  --chrome-fg: var(--ink);
+  --chrome-bd: var(--ink);
+  --chrome-shadow: 0 8px 24px -14px rgba(33, 28, 51, .5);
+}
+:root[data-mode='night'] {
+  /* the sections below the town were a neutral charcoal; now they carry on the town's night sky */
+  --paper: #15142b; --paper-2: #1f1d3a; --kraft: #15142b;
+  --chrome-bg: rgba(24, 22, 54, .62);
+  --chrome-fg: #fff4dd;
+  --chrome-bd: rgba(255, 244, 221, .22);
+  --chrome-shadow: 0 10px 30px -12px rgba(5, 4, 20, .7), inset 0 1px 0 rgba(255, 244, 221, .08);
+}
+
+/* top bar: the nav, résumé, sound and day/night controls share one material */
+.nav, .cv, .music, .mode, .logo {
+  background: var(--chrome-bg); color: var(--chrome-fg); border: 1.5px solid var(--chrome-bd); box-shadow: var(--chrome-shadow);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+  transition: background-color .5s, color .5s, border-color .5s, box-shadow .5s, transform .45s var(--spring), opacity .35s, scale .6s var(--spring), translate .6s var(--spring);
+}
+.logo { background: var(--ink); color: #fff8e6; }
+[data-mode='night'] .logo { background: var(--chrome-bg); color: var(--chrome-fg); border-color: var(--chrome-bd); }
+.nav a { color: inherit; transition: color .25s, background-color .2s; }
+.nav a.on, .nav a[aria-current] { color: var(--ink); }
+[data-mode='night'] .nav a:not(.on) { color: rgba(255, 244, 221, .78); }
+@media (hover: hover) and (pointer: fine) {
+  [data-mode='night'] .nav a:not(.on):hover { color: #fff4dd; background: rgba(255, 244, 221, .08); }
+  [data-mode='night'] .cv:hover { background: var(--sun); color: var(--ink); border-color: var(--sun); }
+}
+[data-mode='night'] .mode, [data-mode='night'] .music { color: #ffd86b; }
+.top-r { gap: 8px; }
+
+/* building tags: still labelled at a glance, but quiet. No bobbing, no hard offset shadow; glass at night */
+.pin-tag {
+  --tag-bg: #fffaf0; --tag-bd: var(--ink); --tag-fg: var(--ink);
+  animation: none; background: var(--tag-bg); color: var(--tag-fg); border: 1.5px solid var(--tag-bd);
+  box-shadow: 0 6px 16px -8px rgba(33, 28, 51, .5); font-weight: 700;
+  transition: transform .5s var(--spring), background-color .25s, color .25s, border-color .25s, box-shadow .3s;
+}
+.pin-tag small { background: none; padding: 0 0 0 .1em; color: var(--ink-2); font-weight: 600; letter-spacing: -.02em; }
+.pin-tag::before { border-top-color: var(--tag-bd); }
+.pin-tag::after { border-top-color: var(--tag-bg); top: calc(100% - 2px); }
+[data-mode='night'] .pin-tag {
+  --tag-bg: #1d1b42; --tag-bd: rgba(255, 244, 221, .3); --tag-fg: #fff4dd;
+  box-shadow: 0 8px 22px -10px rgba(5, 4, 20, .8);
+}
+[data-mode='night'] .pin-tag small { color: rgba(255, 244, 221, .6); }
+[data-mode='night'] .pin-mk { box-shadow: 0 0 0 1.5px rgba(255, 244, 221, .35); }
+/* hovering a building lights its tag (main.js adds .lit), the same as hovering the tag itself */
+.pin.lit .pin-tag, .pin:focus-visible .pin-tag { transform: translateY(-5px) scale(1.06); --tag-bg: var(--sun); --tag-bd: var(--ink); --tag-fg: var(--ink); }
+.pin.lit .pin-tag small, .pin:focus-visible .pin-tag small { color: var(--ink); opacity: .7; }
+@media (hover: hover) and (pointer: fine) {
+  .pin:hover .pin-tag { transform: translateY(-5px) scale(1.06); --tag-bg: var(--sun); --tag-bd: var(--ink); --tag-fg: var(--ink); background: var(--tag-bg); }
+  .pin:hover .pin-tag small { color: var(--ink); opacity: .7; }
+}
+/* a tag that would land on the headline or the buttons steps out of the way (main.js); the building keeps its sign */
+.pin.tucked { opacity: 0 !important; pointer-events: none; }
+
+/* hero copy: one strike-through, not two; tidier spacing around the hand-written word */
+.fix-strike path { stroke-width: 7; }
+.fix-new { margin-inline: .04em .1em; }
+.proof { gap: 10px; padding: 5px 14px 5px 5px; border-width: 1.5px; box-shadow: 0 6px 18px -12px rgba(33, 28, 51, .5); }
+.proof-t b { color: var(--rose-ink); }
+[data-mode='night'] .proof { background: var(--chrome-bg); color: #fff4dd; border-color: var(--chrome-bd); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+[data-mode='night'] .proof-k { background: var(--sun); color: var(--ink); }
+[data-mode='night'] .proof-t b { color: var(--sun); }
+@media (hover: hover) and (pointer: fine) { [data-mode='night'] .proof:hover { background: rgba(40, 37, 84, .8); } }
+/* the two secondary buttons match each other: paper by day, night-sky by night */
+.hero-cta .btn-ink { background: #fffaf0; color: var(--ink); }
+[data-mode='night'] .hero-cta .btn-ink, [data-mode='night'] .hero-cta .btn-paper { background: #1d1b42; color: #fff4dd; border-color: #fff4dd; box-shadow: 3px 3px 0 rgba(255, 244, 221, .35); }
+@media (hover: hover) and (pointer: fine) {
+  [data-mode='night'] .hero-cta .btn-ink:hover, [data-mode='night'] .hero-cta .btn-paper:hover { box-shadow: 5px 5px 0 rgba(255, 244, 221, .45); }
+}
+
+/* ---------- agent lab, cleaner (Nov 2026): one card per project, the number inside it, no shelf ----------
+   Each card: the live preview on top, then what it is, then the one number that matters and a way in. */
+#lab-h .mark { display: block; }
+.bench { margin-top: clamp(36px, 5vw, 56px); padding: 0; }
+.bench-wall, .bench-top { display: none; }
+.bench-row { align-items: stretch; gap: clamp(14px, 1.6vw, 22px); }
+.dev {
+  --lc-bg: var(--card); --lc-bd: var(--ink); --lc-fg: var(--ink); --lc-mut: #5d566f; --lc-line: color-mix(in srgb, var(--ink) 14%, transparent);
+  padding: 10px; gap: 0; border-radius: 22px; background: var(--lc-bg); color: var(--lc-fg); border: 2px solid var(--lc-bd);
+  box-shadow: 0 1px 0 var(--lc-line), 0 18px 40px -26px rgba(20, 16, 40, .55);
+  transition: transform .55s var(--out), box-shadow .55s var(--out), border-color .3s, background-color .5s;
+}
+[data-mode='night'] .dev {
+  --lc-bg: #1d1b3c; --lc-bd: rgba(255, 244, 221, .12); --lc-fg: #fff4dd; --lc-mut: rgba(255, 244, 221, .66); --lc-line: rgba(255, 244, 221, .1);
+  box-shadow: inset 0 1px 0 rgba(255, 244, 221, .06), 0 24px 50px -30px rgba(0, 0, 0, .9);
+}
+.dev-frame { height: 196px; border: 0; border-radius: 14px; box-shadow: none; transition: transform .7s var(--out); isolation: isolate; }
+.dev-frame > .dv-screen { transition: scale .7s var(--out); transform-origin: 50% 60%; }
+.dev-label { padding: 18px 8px 0; background: none; border: 0; box-shadow: none; min-height: 0; gap: 6px; flex: 1; }
+.dev-label b { font-size: 24px; }
+.dev-label small { color: var(--lc-mut); font-size: 14.5px; line-height: 1.45; }
+.dev-kind { background: none; border: 0; padding: 0; color: var(--lc-mut); letter-spacing: .12em; }
+.dev-kind-tool { background: none; color: var(--lc-mut); }
+.dev-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 18px 8px 6px; padding-top: 14px; border-top: 1px solid var(--lc-line); }
+.dev-stat { display: grid; gap: 2px; min-width: 0; }
+.dev-stat b { font: 800 22px/1 var(--f-display); font-variation-settings: 'SOFT' 100; letter-spacing: -.01em; color: var(--rose-ink); }
+[data-mode='night'] .dev-stat b { color: var(--sun); }
+.dev-stat span { font-size: 12.5px; color: var(--lc-mut); }
+.dev-go { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--lc-line); font-style: normal; font-weight: 700; color: var(--lc-fg); transition: background-color .3s, color .3s, border-color .3s, translate .45s var(--spring); }
+@media (hover: hover) and (pointer: fine) {
+  .dev:hover { transform: translateY(-6px); box-shadow: 0 1px 0 var(--lc-line), 0 30px 50px -28px rgba(20, 16, 40, .6); }
+  [data-mode='night'] .dev:hover { --lc-bd: rgba(255, 244, 221, .26); box-shadow: inset 0 1px 0 rgba(255, 244, 221, .08), 0 34px 60px -30px rgba(0, 0, 0, .95); }
+  .dev:hover .dev-frame, .dev:nth-child(even):hover .dev-frame { transform: none; box-shadow: none; }
+  .dev:hover .dev-frame > .dv-screen { scale: 1.04; }
+  .dev:hover .dev-go { background: var(--sun); color: var(--ink); border-color: var(--sun); translate: 3px 0; }
+}
+.dev:focus-visible { outline: 3px solid var(--sun); outline-offset: 4px; }
+.dev:focus-visible .dev-frame { outline: 0; transform: none; box-shadow: none; }
+@media (max-width: 1000px) { .bench-row { row-gap: clamp(14px, 1.6vw, 22px); } }
+@media (max-width: 720px) { .dev-frame { height: 170px; } .dev-label b { font-size: 21px; } }
+/* the skills row under the lab: same card material as the four above, straight, no sticker shadow */
+.mt-h { max-width: 820px; }
+.mt-list { gap: clamp(14px, 1.6vw, 22px); }
+.mt-card {
+  --lc-bg: var(--card); --lc-bd: var(--ink); --lc-mut: #5d566f;
+  rotate: 0deg; padding: 10px 10px 18px; border: 2px solid var(--lc-bd); border-radius: 22px; background: var(--lc-bg);
+  box-shadow: 0 18px 40px -26px rgba(20, 16, 40, .55); transition: transform .55s var(--out), box-shadow .55s var(--out), border-color .3s;
+}
+[data-mode='night'] .mt-card { --lc-bg: #1d1b3c; --lc-bd: rgba(255, 244, 221, .12); --lc-mut: rgba(255, 244, 221, .66); color: #fff4dd; box-shadow: inset 0 1px 0 rgba(255, 244, 221, .06), 0 24px 50px -30px rgba(0, 0, 0, .9); }
+.mt-screen { border: 0; border-radius: 14px; }
+.mt-card > b { margin: 14px 8px 4px; }
+.mt-card > p { margin: 0 8px; color: var(--lc-mut); }
+.mt-tag { margin: 16px 8px 0; padding: 0; border: 0; background: none; color: var(--rose-ink); letter-spacing: .1em; }
+[data-mode='night'] .mt-tag { color: var(--sun); }
+@media (hover: hover) and (pointer: fine) {
+  .mt-card:hover { rotate: 0deg; transform: translateY(-6px); box-shadow: 0 30px 50px -28px rgba(20, 16, 40, .6); }
+  [data-mode='night'] .mt-card:hover { --lc-bd: rgba(255, 244, 221, .26); box-shadow: inset 0 1px 0 rgba(255, 244, 221, .08), 0 34px 60px -30px rgba(0, 0, 0, .95); }
+}
+
+/* ---------------- intro (intro.js): the town builds itself ----------------
+   Until the ticket is torn, the street is empty sky; then the skyline rises, each building springs up
+   from the ground, the street and trees slide in and the headline comes into focus. intro.js sets the
+   start of every move itself; these rules only keep things out of sight before it does. */
+html.intro, html.intro body { overflow: hidden; }
+html.intro :is(.nudge, .ride, .junction, .route) { visibility: hidden; }
+.intro-hide :is(.ly-far, .ly-mid, .ly-street, .ly-fg, .ly-pins, .hero-copy > *, .town-dir, .balloon-lane, #top-bar, .fly-cue, .tap-hint, .pin) { opacity: 0; }
+/* a soft burst of light behind the town as it lands (intro.js) */
+.intro-glow { position: absolute; z-index: 1; left: 50%; bottom: 8%; width: 140vmax; aspect-ratio: 1; translate: -50% 50%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--sun) 55%, transparent), color-mix(in srgb, var(--sun) 18%, transparent) 45%, transparent 70%); mix-blend-mode: soft-light; }
+[data-mode='night'] .intro-glow { background: radial-gradient(closest-side, rgba(255, 214, 107, .35), rgba(185, 166, 242, .14) 45%, transparent 70%); mix-blend-mode: screen; }
+/* while the intro moves the tags, their own hover/fade transitions stay out of the way (they'd chase every frame) */
+.intro :is(.pin, .pin-tag) { transition: none !important; }
+
+/* ---------------- the welcome (prefs.js): a card asks two things in the open sky ----------------
+   The sky behind it is the real hero sky (the town is still hidden), so picking day or night shows at once. */
+@property --gw-veil { syntax: '<number>'; inherits: true; initial-value: 1; }
+.tix-open, .tix-open body { overflow: hidden; }
+.gw { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px 16px; overflow: auto; --gw-veil: 1;
+  background: radial-gradient(90% 70% at 50% 45%, transparent 30%, rgba(12, 10, 34, calc(.38 * var(--gw-veil))) 100%); }
+.gw:not(.first) { background: color-mix(in srgb, var(--ink) calc(38% * var(--gw-veil)), transparent); backdrop-filter: blur(calc(6px * var(--gw-veil))); }
+.gw-wrap { position: relative; display: grid; justify-items: center; width: min(470px, 100%); }
+
+.gw-card { position: relative; width: 100%; padding: 22px 24px 20px; background: #fffaf0; color: var(--ink); border: 2px solid var(--ink); border-radius: 26px;
+  box-shadow: 0 30px 60px -28px rgba(10, 8, 30, .6), 0 2px 0 rgba(33, 28, 51, .08); }
+.gw-hi { margin: 0; font-size: 26px; line-height: 1; color: var(--rose-ink); rotate: -2deg; }
+.gw-h { margin: 8px 0 4px; font: 800 clamp(21px, 2.6vw, 25px)/1.15 var(--f-display); font-variation-settings: 'SOFT' 100, 'WONK' 1; letter-spacing: -.012em; text-wrap: balance; }
+.gw-row { margin: 16px 0 0; padding: 0; border: 0; min-width: 0; }
+.gw-q { padding: 0; margin: 0 0 8px; font: 700 14px var(--f-body); color: var(--ink-2); }
+.gw-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.gw-opt { position: relative; cursor: pointer; }
+.gw-opt input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.gw-opt span { display: inline-flex; align-items: center; gap: 7px; min-height: 42px; padding: 8px 15px 8px 12px; border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--ink) 35%, transparent); background: #fff;
+  font: 700 14.5px var(--f-body); transition: background-color .2s, border-color .2s, box-shadow .3s var(--spring), translate .3s var(--spring), scale .15s var(--out); }
+.gw-opt svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.gw-opt input:checked + span { background: var(--sun); border-color: var(--ink); box-shadow: 2px 3px 0 var(--ink); translate: 0 -2px; }
+.gw-opt input:focus-visible + span { outline: 3px solid var(--rose-ink); outline-offset: 2px; }
+.gw-opt:active span { scale: .95; }
+@media (hover: hover) and (pointer: fine) { .gw-opt:hover input:not(:checked) + span { border-color: var(--ink); background: color-mix(in srgb, var(--sun) 22%, #fff); } }
+.gw-go-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 22px; padding-top: 18px; border-top: 1.5px dashed color-mix(in srgb, var(--ink) 22%, transparent); }
+.gw-go { display: inline-flex; align-items: center; gap: 10px; padding: 13px 24px; border-radius: 999px; border: 2.5px solid var(--ink); background: var(--ink); color: #fff8e6; font: 800 17px var(--f-body); cursor: pointer;
+  box-shadow: 0 10px 24px -12px rgba(33, 28, 51, .7); transition: background-color .25s, color .25s, box-shadow .3s; }
+.gw-go span { transition: translate .35s var(--spring); }
+@media (hover: hover) and (pointer: fine) { .gw-go:hover { background: var(--sun); color: var(--ink); } .gw-go:hover span { translate: 4px 0; } }
+.gw-go:focus-visible { outline: 3px solid var(--rose-ink); outline-offset: 3px; }
+.gw-fine { flex: 1; min-width: 150px; font: 600 12.5px/1.35 var(--f-body); color: var(--ink-2); }
+[data-mode='night'] .gw-card { box-shadow: 0 30px 70px -26px rgba(0, 0, 0, .85), 0 0 0 1px rgba(255, 244, 221, .06); }
+@media (max-width: 520px) {
+  .gw-card { padding: 18px 16px 16px; border-radius: 22px; }
+  .gw-opt span { font-size: 13.5px; padding: 7px 12px 7px 10px; min-height: 40px; }
+  .gw-go { width: 100%; justify-content: center; }
+}
+/* phones held upright: the town is a short strip, and the sun and moon sat down among the buildings,
+   leaning on the tower. Smaller, and up in the clear corner of sky to the right of the tower. */
+@media (max-aspect-ratio: 3/4) {
+  .ly-sky .sun, .ly-sky .moon { transform-origin: 1290px 175px; }
+  .ly-sky .sun { translate: 140px -60px; scale: .5; }
+  .ly-sky .moon { translate: 140px -55px; scale: .62; }
+  .ly-sky .sky-hint { display: none; }
+  /* the welcome sits up top, so the sky (and the sun or moon) shows below it */
+  .gw.first { place-items: start center; padding-top: max(16px, 4svh); }
+}
+/* phones: a more compact welcome, so the sun or moon shows in the sky beneath it */
+@media (max-width: 520px) {
+  .gw-card { padding: 16px 16px 14px; }
+  .gw-h { font-size: 20px; }
+  .gw-row { margin-top: 12px; }
+  .gw-q { margin-bottom: 6px; }
+  .gw-go-row { margin-top: 16px; padding-top: 14px; }
+  .gw-fine { display: none; }
+}
+
+/* ---------------- calmer town (Nov 2026) ----------------
+   Each building already carries its own sign, so its tag (name and years) only shows while you point at the
+   building or the tag's spot, springing up from the roof. The kite is put away: one thing in the sky
+   (the balloon) is enough. */
+.pin { opacity: 0; transition: opacity .25s var(--out); }
+.pin .pin-tag { translate: 0 8px; scale: .92; transition: translate .45s var(--spring), scale .45s var(--spring), background-color .25s, color .25s, border-color .25s; }
+.pin.lit, .pin:focus-visible { opacity: 1; }
+.pin.lit .pin-tag, .pin:focus-visible .pin-tag { translate: 0 0; scale: 1; }
+@media (hover: hover) and (pointer: fine) { .pin:hover { opacity: 1; } .pin:hover .pin-tag { translate: 0 0; scale: 1; } }
+.bld[data-id='home'] > .dayonly, .flier .dayonly { display: none; }
+/* every building now carries its own sign (the house got one too), so the floating tags are retired.
+   Phones keep the "tap a building" list under the headline. */
+.pins .pin { display: none; }
+.lit.lit-text.sign-s { font-size: 10px; letter-spacing: .05em; }
+
+/* ---------------- journey art (journey-art.js): full city panoramas with small living details ----------------
+   Each scene is right-anchored and as wide as its height allows, so phones see the landmark end. */
+.jr-sky { position: absolute; inset: 0 0 auto 0; height: 70%; pointer-events: none; }
+.jr-sky svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.jr-cities { overflow: hidden; height: 82%; }
+.city { inset: 0; right: 0; height: auto; max-width: none; aspect-ratio: auto; }
+.city svg { position: absolute; right: 0; bottom: 0; height: 100%; width: auto; aspect-ratio: 4; overflow: visible; }
+.city-name { z-index: 2; }
+@media (max-width: 760px) { .city { max-width: none; } }
+
+.ja-sway { animation: jasway 4.2s ease-in-out var(--sd, 0s) infinite alternate; }
+@keyframes jasway { from { rotate: -2.2deg; } to { rotate: 2.2deg; } }
+.ja-flag { animation: jaflag 1.6s ease-in-out infinite alternate; }
+@keyframes jaflag { from { scale: 1 1; } to { scale: .82 1.04; } }
+.ja-waves { animation: jawaves 3.2s linear infinite; }
+@keyframes jawaves { to { translate: 22px 0; } }
+.ja-bob { animation: jabob 2.6s ease-in-out var(--bd, 0s) infinite alternate; }
+@keyframes jabob { from { rotate: -3deg; translate: 0 0; } to { rotate: 3deg; translate: 0 2px; } }
+.ja-ferry { animation: jaferry 46s linear infinite; }
+@keyframes jaferry { from { translate: -120px 0; } to { translate: 1720px 0; } }
+.ja-metro { animation: jametro 16s linear infinite; }
+@keyframes jametro { from { translate: -300px 0; } to { translate: 1700px 0; } }
+.ja-jib { animation: jajib 9s ease-in-out infinite alternate; }
+@keyframes jajib { from { scale: 1 1; } to { scale: .72 1; } }
+.ja-hook { animation: jahook 3s ease-in-out infinite alternate; }
+@keyframes jahook { from { scale: 1 .7; } to { scale: 1 1.1; } }
+.ja-kite { animation: jakite 3.4s ease-in-out infinite alternate; }
+@keyframes jakite { from { rotate: -2deg; } to { rotate: 2.4deg; } }
+.ja-peck { animation: peck 4s ease-in-out var(--pk, 0s) infinite; }
+.ja-smoke circle { transform-box: fill-box; transform-origin: center; animation: puff 4s ease-out infinite; }
+.ja-fly { animation: jafly var(--fd, 40s) linear var(--fdl, 0s) infinite; }
+@keyframes jafly { from { translate: -200px 0; } to { translate: 1800px -30px; } }
+.ja-glide { animation: jaglide 7s ease-in-out var(--gd, 0s) infinite alternate; }
+@keyframes jaglide { from { translate: -30px 6px; rotate: -4deg; } to { translate: 40px -8px; rotate: 4deg; } }
+.ja-cloud { animation: jacloud var(--cd, 120s) linear var(--cdl, 0s) infinite; }
+@keyframes jacloud { from { translate: -300px 0; } to { translate: 1700px 0; } }
+.ja-petals ellipse { animation: japetal 7s linear var(--pd, 0s) infinite; opacity: 0; }
+@keyframes japetal { 0% { translate: 0 0; rotate: 0deg; opacity: 0; } 10% { opacity: 1; } 100% { translate: 40px 60px; rotate: 360deg; opacity: 0; } }
+.ja-beam { opacity: 0; transform-box: view-box; transform-origin: 1446px 174px; animation: jabeam 6s ease-in-out infinite alternate; transition: opacity .8s; }
+[data-mode='night'] .ja-beam { opacity: .2; }
+@keyframes jabeam { from { rotate: -14deg; } to { rotate: 10deg; } }
+.ja-glow { opacity: 0; transition: opacity .8s; }
+[data-mode='night'] .ja-glow { opacity: .3; }
+.lit.far { fill: #ffe29a; }
+[data-mode='night'] .jr-pin .lit.far { opacity: .75; }
+@media (prefers-reduced-motion: reduce) {
+  .jr-pin [class^='ja-'], .jr-pin [class*=' ja-'], .ja-smoke circle, .ja-petals ellipse { animation: none !important; }
+  .ja-ferry { translate: 1100px 0; } .ja-metro { translate: 300px 0; }
+}
+.jr-cities { bottom: 200px; height: 78%; }
+@media (max-width: 760px) { .jr-cities { bottom: 170px; } }
+/* more life: balloons, a Ferris wheel, a plane, a cow, glinting glass, the journey's own sun and moon */
+.ja-float { animation: jafloat 7s ease-in-out var(--fl, 0s) infinite alternate; }
+@keyframes jafloat { from { translate: 0 0; } 50% { translate: 14px -10px; } to { translate: 26px 6px; } }
+.ja-wheel { animation: spin 40s linear infinite; }
+.ja-gondola { animation: spin 40s linear infinite reverse; }
+.ja-tail { animation: tail 1.8s ease-in-out infinite alternate; }
+.ja-graze { animation: jagraze 5s ease-in-out infinite; }
+@keyframes jagraze { 0%, 30%, 100% { rotate: 0deg; } 45%, 80% { rotate: 22deg; } }
+.ja-glint { animation: jaglint 5s ease-in-out infinite; }
+@keyframes jaglint { 0%, 50% { translate: 0 0; } 85%, 100% { translate: 190px 0; } }
+.ja-plane { animation: japlane 30s linear -8s infinite; }
+@keyframes japlane { from { translate: -200px 40px; } to { translate: 1800px -30px; } }
+.ja-rays { animation: spin 50s linear infinite; }
+.ja-sun { transition: opacity .8s, translate 1.4s var(--out); }
+.ja-moon { opacity: 0; translate: 0 40px; transition: opacity .8s, translate 1.4s var(--out); }
+[data-mode='night'] .ja-sun, [data-mode='dusk'] .ja-sun { opacity: 0; translate: 0 60px; }
+[data-mode='night'] .ja-moon { opacity: 1; translate: 0 0; }
+.ja-cloud > g { animation: jacbob 6s ease-in-out infinite alternate; }
+@keyframes jacbob { to { translate: 0 6px; } }
+@media (prefers-reduced-motion: reduce) { .ja-wheel, .ja-gondola, .ja-rays, .ja-cloud > g { animation: none !important; } }
+.jr-sky svg { position: absolute; left: 50%; top: 0; translate: -50% 0; width: max(100%, 1100px); height: auto; aspect-ratio: 4; }
+/* journey layers: colour tokens per plane (far → near), haze, window tint, sea */
+.jr-pin { --jl1: #cfe1f0; --jl2: #aac6df; --jl3: #7f9fc2; --jl4: #4f7192; --jlh: #eef6fc; --jlw: rgba(255, 255, 255, .38); --jlb: rgba(214, 90, 74, .55); --jls: #9fd3ea; }
+[data-mode='dusk'] .jr-pin { --jl1: #f0c3b8; --jl2: #d99fa2; --jl3: #a8789a; --jl4: #6c4f7a; --jlh: #ffe2cf; --jlw: rgba(255, 236, 214, .4); --jls: #f2b0a0; }
+[data-mode='night'] .jr-pin { --jl1: #2f3168; --jl2: #26285a; --jl3: #1d1e4a; --jl4: #141536; --jlh: #3b3474; --jlw: rgba(255, 244, 221, .08); --jlb: rgba(160, 70, 90, .35); --jls: #2a3a6e; }
+.ja-mist { animation: jamist 26s ease-in-out infinite alternate; }
+@keyframes jamist { to { translate: 120px 0; } }
+.ja-breathe { animation: jabreathe 6s ease-in-out var(--sd, 0s) infinite alternate; }
+@keyframes jabreathe { from { rotate: -1.6deg; scale: 1 1; } to { rotate: 1.8deg; scale: 1.02 .98; } }
+.ja-shimmer path { animation: jashim 3.2s ease-in-out infinite; }
+@keyframes jashim { 0%, 100% { opacity: 0; translate: -6px 0; } 50% { opacity: .85; translate: 6px 0; } }
+.ja-halo { transform-box: fill-box; transform-origin: center; animation: jahalo 5s ease-in-out infinite alternate; }
+@keyframes jahalo { to { scale: 1.15; opacity: .8; } }
+[data-mode='night'] .ja-beam { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .ja-mist, .ja-breathe, .ja-shimmer path, .ja-halo { animation: none !important; } .ja-shimmer path { opacity: .6; } }
+/* journey night: one tint dims the coloured scene; lights sit above it */
+.jr-pin { --jl1: #d4e6f3; --jl2: #b4cfe5; --jlh: #eef6fc; --jlw: rgba(255, 255, 255, .4); }
+[data-mode='dusk'] .jr-pin { --jl1: #f0c9bd; --jl2: #dfaaa8; --jlh: #ffe6d6; --jlw: rgba(255, 236, 214, .45); }
+[data-mode='night'] .jr-pin { --jl1: #6f6cb0; --jl2: #5c5aa0; --jlh: #8d80c8; --jlw: rgba(255, 244, 221, .12); }
+.ja-tint { fill: #1b1850; mix-blend-mode: multiply; opacity: 0; transition: opacity 1.2s ease; pointer-events: none; }
+[data-mode='dusk'] .ja-tint { opacity: .22; }
+[data-mode='night'] .ja-tint { opacity: .62; }
+.ja-hglow { mix-blend-mode: screen; opacity: 0; transition: opacity 1.6s ease .4s; }
+[data-mode='dusk'] .ja-hglow { opacity: .35; }
+[data-mode='night'] .ja-hglow { opacity: .55; }
+.ja-bulb { fill: #ffe7a3; opacity: 0; transition: opacity .5s ease calc(var(--wd, 0s) * .3); }
+[data-mode='night'] .ja-bulb { opacity: 1; transition: opacity .6s ease calc(var(--wd, 0s) + .6s); animation: jabulb 2.6s ease-in-out var(--bd, 0s) infinite alternate; filter: drop-shadow(0 0 2px rgba(255, 210, 120, .9)); }
+@keyframes jabulb { to { fill: #fff6d8; fill-opacity: .55; } }
+.ja-refl { opacity: 0; transition: opacity .8s; }
+[data-mode='night'] .ja-refl { opacity: .7; animation: jarefl 2.4s ease-in-out var(--rd, 0s) infinite alternate; }
+@keyframes jarefl { from { scale: 1 .7; translate: -1px 0; } to { scale: 1 1.15; translate: 1px 2px; } }
+.jr-pin .ja-refl { transform-box: fill-box; transform-origin: 50% 0; }
+[data-mode='night'] .jr-pin .ja-shimmer path { stroke: #ffe7a3; }
+@media (prefers-reduced-motion: reduce) { [data-mode='night'] .ja-bulb, [data-mode='night'] .ja-refl { animation: none; } }
+.jr-hills { transition: filter 1.2s ease; }
+[data-mode='night'] .jr-hills { filter: brightness(.62) saturate(.75) hue-rotate(-8deg); }
+[data-mode='dusk'] .jr-hills { filter: brightness(.88) saturate(.9); }
+/* night dims each coloured building on its own, so lights drawn after it sit on it and nothing behind shows through */
+.ja-dim { transition: filter 1.2s ease; }
+[data-mode='dusk'] .ja-dim { filter: brightness(.86) saturate(.95) sepia(.12); }
+[data-mode='night'] .ja-dim { filter: brightness(.42) saturate(.75) hue-rotate(12deg); }
+.city svg { max-width: none; }
+@media (max-width: 760px) { .jr-cities { height: 70%; } }
+[data-mode='night'] .jr-pin { --jl1: #36377a; --jl2: #2a2b63; --jlh: #4a4290; --jlw: rgba(255, 244, 221, .07); }
+[data-mode='night'] .jr-pin { --jlh: #39336f; }
+[data-mode='night'] .ja-hglow { opacity: .28; }
+.ja-metro { animation: jametro 24s linear infinite; }
+@keyframes jametro { from { translate: -820px 0; } to { translate: 1700px 0; } }
+.ja-headbeam { opacity: 0; transition: opacity .8s; }
+[data-mode='night'] .ja-headbeam { opacity: .3; }

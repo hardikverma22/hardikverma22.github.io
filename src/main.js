@@ -4,7 +4,8 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { skillsBuilt, markets, writing, testimonials, projects, toolbox, toolboxGroups, awards, identity } from './data.js';
 import { buildings, story, stickies, milestones, tiffin } from './world.js';
-import { townMarkup, agentCar, skylines } from './town.js';
+import { townMarkup, agentCar } from './town.js';
+import { journeyScenes, journeySky, journeyHills } from './journey-art.js';
 import { mark } from './marks.js';
 import { initGuide } from './guide.js';
 import { initNudge } from './nudge.js';
@@ -404,8 +405,29 @@ cam.addEventListener('pointerover', (e) => {
   const b = e.target.closest?.('.bld')?.dataset.id || null;
   $$('.ly-mid .up', cam).forEach((el) => { if ((el.dataset.id || el.dataset.b) !== b) el.classList.remove('up'); });
   if (b) $$(`.ly-mid .bld[data-id="${b}"], .ly-mid .bl[data-b="${b}"]`, cam).forEach((el) => el.classList.add('up'));
+  $$('.pin', cam).forEach((p) => p.classList.toggle('lit', p.dataset.id === b));
 });
-cam.addEventListener('pointerleave', () => $$('.ly-mid .up', cam).forEach((el) => el.classList.remove('up')));
+cam.addEventListener('pointerleave', () => { $$('.ly-mid .up', cam).forEach((el) => el.classList.remove('up')); $$('.pin.lit', cam).forEach((p) => p.classList.remove('lit')); });
+
+// A building tag that would sit on the headline or the buttons (taller screens bring the town up into
+// the copy) steps aside; the building still carries its own sign.
+const heroBits = $$('#hero-copy > *');
+const tuckPins = () => {
+  if (scrollY > 40) return; // the copy drifts away on scroll; measure only where the two can meet
+  const pad = 14;
+  // the ink, not the block: lines of text and the buttons themselves, so a tag right of a short line can stay
+  const boxes = heroBits.flatMap((el) => { const rg = document.createRange(); rg.selectNodeContents(el); return [...rg.getClientRects()]; }).filter((r) => r.width && r.height);
+  $$('.pin', cam).forEach((p) => {
+    p.classList.remove('tucked');
+    const r = p.getBoundingClientRect();
+    p.classList.toggle('tucked', boxes.some((b) => r.left < b.right + pad && r.right > b.left - pad && r.top < b.bottom + pad && r.bottom > b.top - pad));
+  });
+};
+let tuckT = 0;
+const tuckSoon = () => { clearTimeout(tuckT); tuckT = setTimeout(tuckPins, 120); };
+addEventListener('resize', tuckSoon);
+document.fonts?.ready.then(tuckSoon);
+setTimeout(tuckPins, 400);
 cam.addEventListener('click', (e) => {
   const t = e.target.closest('.pin, .bld');
   if (t) openBuilding(t.dataset.id);
@@ -483,14 +505,9 @@ const AUTO_BODY = 82 / 240; // where the auto's body sits within its svg box
 $('#jr-track').innerHTML = milestones.map((m, i) => `<div class="stone" data-i="${i}"><div class="stone-b"><div class="stone-top">${esc(m.place)}</div><div class="stone-y">${m.y}</div>${mark(m.co, 'stone-mk')}</div></div>`).join('');
 // one skyline per city; they cross-fade as the auto arrives somewhere new
 const cities = [...new Set(milestones.map((m) => m.place))];
-$('#jr-cities').innerHTML = cities.map((c) => `<div class="city" data-city="${c}">${skylines[c] || ''}</div>`).join('') + '<span class="city-name hand" id="city-name"></span>';
-(() => {
-  let d = 'M0 260 ', trees = '';
-  for (let x = 0; x <= 6000; x += 200) d += `Q${x + 100} ${200 + ((x / 200) % 3) * 30} ${x + 200} 240 `;
-  d += 'V400 H0 Z';
-  for (let x = 60; x < 6000; x += 130 + ((x * 7) % 90)) trees += `<g transform="translate(${x} ${238 - ((x / 13) % 18)})"><path d="M0 0 v-20" stroke="var(--ink)" stroke-width="4"/><circle cy="-34" r="${16 + ((x / 5) % 8)}" fill="var(--leaf-1)" stroke="var(--ink)" stroke-width="3"/></g>`;
-  $('#jr-hills').innerHTML = `<svg viewBox="0 0 6000 400" preserveAspectRatio="none"><path d="${d}" fill="var(--hill-near)" stroke="var(--ink)" stroke-width="3"/>${trees}</svg>`;
-})();
+$('#jr-cities').innerHTML = cities.map((c) => `<div class="city" data-city="${c}">${journeyScenes[c] || ''}</div>`).join('') + '<span class="city-name hand" id="city-name"></span>';
+$('#jr-pin').insertAdjacentHTML('afterbegin', `<div class="jr-sky" aria-hidden="true">${journeySky()}</div>`);
+$('#jr-hills').innerHTML = journeyHills();
 // progress strip: one dot per stop, coloured by company
 const coColour = { tcs: '#EE3984', hm: '#E50010', fidelity: '#368727', walmart: '#0071CE', home: '#ef6a5b' };
 $('#jr-meter').innerHTML = `<span class="jm-y" id="jm-y"></span><span class="jm-dots">${milestones.map((m, i) => `<i style="--c:${coColour[m.co]}" data-i="${i}"></i>`).join('')}</span>`;
@@ -965,7 +982,7 @@ const guideReady = new Promise((ok) => setTimeout(() => {
   };
   if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 1500 }); else setTimeout(go, 0);
 }, 1400));
-const introOver = runIntro({ reduced, gate: prefs.gate, boot: guideReady, onSwap: headline.play, onDone: () => { lenis?.start(); setTimeout(headline.play, 250); } });
+const introOver = runIntro({ reduced, gate: prefs.gate, boot: guideReady, onSwap: headline.play, onDone: () => { lenis?.start(); setTimeout(headline.play, 250); setTimeout(tuckPins, 1600); } });
 // the full scroll refresh is heavy; let it wait until the intro has finished so it can't stall it
 addEventListener('load', () => introOver.then(() => ScrollTrigger.refresh()));
 

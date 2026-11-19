@@ -1,12 +1,11 @@
-// The entry ticket. On a first visit, before the pen draws the town, a paper ticket to Agent Town sits on
-// the blank sheet and asks two things: how it should sound (music and sounds, just sounds, or silent) and
-// what light to see it in (day, night, or the visitor's own time). Every choice previews straight away:
-// the sheet darkens for night, the music fades in. Then you tear off the stub to go in.
+// The welcome. Before the town builds, a card in the open sky asks two things: how it should sound
+// (music and sounds, just sounds, or silent) and what light to see it in (day, night, or the visitor's
+// own time). Every choice previews straight away, right behind the card: pick night and the sky turns
+// to stars; pick music and it fades in. Then "Let's go": the card folds away and the town builds up
+// (intro.js starts on the 'tix-leaving' event).
 //
-// The tear is a real gesture: the stub hangs from the top of the perforation and follows the pointer
-// down 1:1, ticking as the fibres give; let go early and it springs back, pull far enough (or flick)
-// and it rips off and falls. A tap, Enter or Escape tears it too. The choice is remembered; the ticket
-// comes back on every visit with the last choices already picked, and it can be reopened from the footer.
+// Enter or Escape goes in too. The choice is remembered; the welcome comes back on every visit with the
+// last choices already picked (and the chat already typed out), and the footer can reopen it.
 import { gsap } from 'gsap';
 import { sfx, setSoundMode, unlockSound } from './sfx.js';
 
@@ -57,138 +56,78 @@ export function initPrefs({ reduced, lenis, music, setNight }) {
   function show({ first } = {}) {
     if (open) return Promise.resolve();
     open = true;
+    const returning = !!saved || !first; // they've been here: no typing, the chat is already there
     const scene = document.createElement('div');
-    scene.className = `tix-scene${first ? ' first' : ''}`;
+    scene.className = `tix-scene gw${first ? ' first' : ''}`;
     scene.setAttribute('role', 'dialog');
     scene.setAttribute('aria-modal', 'true');
-    scene.setAttribute('aria-labelledby', 'tix-h');
-    const today = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date()).toUpperCase();
-    const group = (name, legend, opts, cur) => `<fieldset class="tix-row"><legend>${legend}</legend><div class="tix-opts">${opts.map(([v, l]) =>
-      `<label class="tix-opt"><input type="radio" name="tix-${name}" value="${v}"${v === cur ? ' checked' : ''}><span>${I[v]}${l}</span></label>`).join('')}</div></fieldset>`;
-    scene.innerHTML = `<div class="tix">
-      <div class="tix-main">
-        <p class="tix-k"><span>Admit one · Agent Town</span><span>${today}</span></p>
-        <h2 class="tix-h" id="tix-h">Before you come in, how would you like the visit?</h2>
-        ${group('sound', 'Sound', SOUND, prefs.sound)}
-        ${group('light', 'Light', LIGHT, prefs.light)}
-        <p class="tix-fine">You can change these any time from the top bar.</p>
+    scene.setAttribute('aria-labelledby', 'gw-h');
+    const group = (name, q, opts, cur) => `<fieldset class="gw-row"><legend class="gw-q">${q}</legend><div class="gw-opts">${opts.map(([v, l]) =>
+      `<label class="gw-opt"><input type="radio" name="gw-${name}" value="${v}"${v === cur ? ' checked' : ''}><span>${I[v]}${l}</span></label>`).join('')}</div></fieldset>`;
+    scene.innerHTML = `<div class="gw-wrap">
+      <div class="gw-card">
+        <p class="gw-hi hand">${first ? (saved ? 'Welcome back!' : 'Hey, welcome!') : 'Change of plan?'}</p>
+        <h2 class="gw-h" id="gw-h">${first ? 'Two quick things before you step into Hardik’s town.' : 'Pick again, then back to the town.'}</h2>
+        ${group('sound', 'How should it sound?', SOUND, prefs.sound)}
+        ${group('light', 'Day or night?', LIGHT, prefs.light)}
+        <div class="gw-go-row"><button class="gw-go" type="button">${first ? 'Let’s go' : 'Back to town'} <span aria-hidden="true">→</span></button><span class="gw-fine">You can change these any time from the top bar.</span></div>
       </div>
-      <button class="tix-stub" type="button" aria-label="Tear the stub to enter Agent Town">
-        <span class="tix-stub-in"><b>Enter</b><small>pull to tear</small><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6"/></svg><span class="tix-no">No. ${String(Math.floor(Math.random() * 9000) + 1000)}</span></span>
-      </button>
     </div>`;
     document.body.append(scene);
     root.classList.add('tix-open');
     lenis?.stop();
-    const ticket = scene.querySelector('.tix'), stub = scene.querySelector('.tix-stub');
+    const card = scene.querySelector('.gw-card');
+    const go = scene.querySelector('.gw-go');
+    const steps = [...scene.querySelectorAll('.gw-hi, .gw-h, .gw-row, .gw-go-row')];
+
+    let arrive = null;
 
     // choices preview live
     scene.addEventListener('change', (e) => {
       const { name, value } = e.target;
-      if (name === 'tix-sound') applySound(value, { preview: true });
-      if (name === 'tix-light') {
+      if (name === 'gw-sound') applySound(value, { preview: true });
+      if (name === 'gw-light') {
         prefs.light = value;
         setNight(value === 'night' || (value === 'auto' && nightByClock()));
         sfx('tick');
       }
     });
 
-    // arrive: the ticket is set down on the paper with a little settle
-    if (!reduced) gsap.fromTo(ticket, { y: 40, rotate: -4, autoAlpha: 0 }, { y: 0, rotate: -1.2, autoAlpha: 1, duration: 0.9, ease: 'elastic.out(1, 0.75)', delay: first ? 0.25 : 0 });
+    // arrive: the card rises into view; the lines come in one by one (all at once for returning visitors)
+    if (!reduced) {
+      const tl = arrive = gsap.timeline({ delay: first ? 0.15 : 0 });
+      tl.call(() => sfx('pop'), null, 0.1)
+        .fromTo(card, { y: 30, autoAlpha: 0, scale: 0.94, transformOrigin: '50% 100%' }, { y: 0, autoAlpha: 1, scale: 1, duration: 0.7, ease: 'back.out(1.6)' }, 0);
+      if (returning) {
+        tl.from(steps, { y: 10, autoAlpha: 0, stagger: 0.05, duration: 0.4, ease: 'power2.out' }, 0.35);
+      } else {
+        // the lines arrive one by one, like messages
+        tl.from(steps, { y: 14, autoAlpha: 0, stagger: 0.12, duration: 0.5, ease: 'back.out(1.6)' }, 0.4)
+          .call(() => sfx('tick'), null, 0.4);
+      }
+    }
     requestAnimationFrame(() => scene.querySelector('input:checked')?.focus({ preventScroll: true }));
 
-    // keep focus inside the ticket; Escape and Enter on the stub go in
+    // keep focus inside; Enter (anywhere) and Escape go in
     scene.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { e.preventDefault(); tear(); }
+      if (e.key === 'Escape' || (e.key === 'Enter' && e.target !== go)) { e.preventDefault(); enter(); return; }
       if (e.key !== 'Tab') return;
       const f = [...scene.querySelectorAll('input:checked, button')];
       const i = f.indexOf(document.activeElement);
       if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
       else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
     });
+    go.addEventListener('click', () => enter());
 
-    // The tear. It runs along the perforation as you pull: on a wide screen from the top of the stub
-    // down, on a phone from the left across. The torn part peels away and curls off the page, hinged at
-    // the point where the paper still holds, little fibres flick off at the tear front, and the edges are
-    // ragged, not cut. Let go early and it lies back down; pull past halfway (or flick) and it rips free.
-    const tall = matchMedia('(max-width: 600px)').matches; // the stub sits under the ticket, not beside it
-    const main = ticket.querySelector('.tix-main');
-    const st = { p: 0 };
-    let id = null, y0 = 0, last = [], step = 0, torn = false, roughened = false;
+    // dev only: a handle for stepping through it
+    if (import.meta.env.DEV) window.__gw = { enter: () => enter() };
 
-    // ragged edges, one shared random line so the two halves of the tear still fit together
-    function roughen() {
-      if (roughened) return;
-      roughened = true;
-      const n = 36, j = Array.from({ length: n + 1 }, () => 1 + Math.random() * 5);
-      const at = (i) => ((i / n) * 100).toFixed(2);
-      if (!tall) {
-        stub.style.clipPath = `polygon(${j.map((x, i) => `${x.toFixed(1)}px ${at(i)}%`).join(',')}, 100% 100%, 100% 0)`;
-        main.style.clipPath = `polygon(0 0, ${j.map((x, i) => `calc(100% - ${(6 - x).toFixed(1)}px) ${at(i)}%`).join(',')}, 0 100%)`;
-      } else {
-        stub.style.clipPath = `polygon(${j.map((y, i) => `${at(i)}% ${y.toFixed(1)}px`).join(',')}, 100% 100%, 0 100%)`;
-        main.style.clipPath = `polygon(0 0, 100% 0, ${j.slice().reverse().map((y, i) => `${at(n - i)}% calc(100% - ${(6 - y).toFixed(1)}px)`).join(',')})`;
-      }
-    }
-    // a fibre of paper flicked off the tear front
-    function fibre(spray = 1) {
-      const r = stub.getBoundingClientRect();
-      const x = tall ? r.left + st.p * r.width : r.left, y = tall ? r.top : r.top + st.p * r.height;
-      const f = document.createElement('i');
-      f.className = 'tix-fibre';
-      f.style.cssText = `left:${x}px;top:${y}px;--s:${(3 + Math.random() * 5).toFixed(1)}px`;
-      scene.append(f);
-      gsap.fromTo(f, { x: 0, y: 0, rotate: Math.random() * 180, autoAlpha: 1 }, {
-        x: (tall ? gsap.utils.random(-20, 20) : gsap.utils.random(4, 40)) * spray,
-        y: gsap.utils.random(30, 110) * spray, rotate: '+=' + gsap.utils.random(-260, 260),
-        autoAlpha: 0, duration: gsap.utils.random(0.6, 1.1), ease: 'power1.in', onComplete: () => f.remove(),
-      });
-    }
-    // draw the tear at progress p (0..1): the freed part lifts and curls about where it still holds
-    function render() {
-      const p = st.p;
-      if (!tall) gsap.set(stub, { transformOrigin: '0% 100%', rotate: p * 16, rotationY: -p * 26, x: p * 7, transformPerspective: 700 });
-      else gsap.set(stub, { transformOrigin: '100% 0%', rotate: -p * 12, rotationX: p * 30, y: p * 6, transformPerspective: 700 });
-      const k = Math.floor(p * 12);
-      if (k > step) { for (let i = step; i < k; i++) fibre(); step = k; sfx('ripStep'); }
-    }
-
-    // dev only: a handle for stepping through the tear
-    if (import.meta.env.DEV) window.__tix = { st, render, roughen, tear: (v) => tear(v) };
-    stub.addEventListener('pointerdown', (e) => {
-      if (torn || e.button > 0) return;
-      unlockSound();
-      roughen();
-      id = e.pointerId; y0 = e.clientY; last = [[e.clientY, performance.now()]];
-      stub.setPointerCapture(id);
-      gsap.killTweensOf(st);
-      stub.classList.add('held');
-    });
-    stub.addEventListener('pointermove', (e) => {
-      if (e.pointerId !== id) return;
-      const dy = Math.max(0, e.clientY - y0);
-      // 1:1 at first, then the paper resists as it nears the point of giving way (rubber-band)
-      st.p = Math.min(1, dy / (dy + 140));
-      render();
-      last.push([e.clientY, performance.now()]); if (last.length > 5) last.shift();
-    });
-    const release = (e) => {
-      if (e.pointerId !== id) return;
-      id = null; stub.classList.remove('held');
-      const [[ya, ta], [yb, tb]] = [last[0], last[last.length - 1]];
-      const v = tb > ta ? ((yb - ya) / (tb - ta)) * 1000 : 0; // px per second, downwards
-      const moved = Math.abs(e.clientY - y0) > 6;
-      if (!moved || st.p >= 0.42 || v > 650) tear(v);
-      else gsap.to(st, { p: 0, duration: 0.7, ease: 'elastic.out(1, 0.6)', onUpdate: render, onComplete: () => { step = 0; } }); // it lies back down
-    };
-    stub.addEventListener('pointerup', release);
-    stub.addEventListener('pointercancel', release);
-    stub.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tear(); } });
-
-    function tear(v = 0) {
-      if (torn) return;
-      torn = true;
+    let entered = false;
+    function enter() {
+      if (entered) return;
+      entered = true;
       save();
+      unlockSound();
       const finish = () => {
         scene.remove();
         root.classList.remove('tix-open');
@@ -196,29 +135,25 @@ export function initPrefs({ reduced, lenis, music, setNight }) {
         open = false;
         done();
       };
-      if (reduced) { sfx('tear'); gsap.to(scene, { autoAlpha: 0, duration: 0.25, onComplete: finish }); return; }
-      roughen();
-      const fast = Math.min(1, v / 2500);
+      const leave = () => dispatchEvent(new Event('tix-leaving'));
+      if (reduced) { leave(); gsap.to(scene, { autoAlpha: 0, duration: 0.25, onComplete: finish }); return; }
+      arrive?.progress(1).kill(); // a quick Enter lands everything where it belongs first
       const tl = gsap.timeline({ onComplete: finish });
-      if (import.meta.env.DEV) window.__tix.tl = tl;
+      if (import.meta.env.DEV) window.__gw.tl = tl;
       tl
-        // the rest of the perforation gives way, quicker if it was pulled hard
-        .to(st, { p: 1, duration: 0.28 - fast * 0.14, ease: 'power2.in', onUpdate: render })
-        .call(() => { sfx('tear'); for (let i = 0; i < 8; i++) fibre(1.6); })
-        .addLabel('free')
-        // the stub drops away, tumbling as it falls, keeping the way it was curling
-        .to(stub, tall
-          ? { y: innerHeight * 0.75, x: -50, rotate: -46, rotationX: 75, duration: 1.05, ease: 'power2.in' }
-          : { y: innerHeight * 0.85, x: 90, rotate: 62, rotationY: -80, rotationX: 30, duration: 1.05, ease: 'power2.in' }, 'free')
-        .to(stub, { autoAlpha: 0, duration: 0.3 }, 'free+=0.75')
-        // and slips into the town: it tips back, away from you, and fades into the paper
-        .to(ticket, { rotationX: 58, y: -24, scale: 0.86, autoAlpha: 0, transformOrigin: '50% 100%', duration: 0.65, ease: 'power2.in' }, 'free+=0.85')
-        .to(scene, { autoAlpha: 0, duration: 0.45 }, 'free+=1.2');
+        // the button gives a satisfying press
+        .to(go, { scale: 0.94, duration: 0.08, ease: 'power2.out' })
+        .to(go, { scale: 1, duration: 0.4, ease: 'elastic.out(1.2, 0.4)' })
+        // the card lifts and drifts away into the sky; the town starts building beneath it
+        .to(card, { y: -60, scale: 0.9, autoAlpha: 0, transformOrigin: '50% 50%', duration: 0.5, ease: 'back.in(1.4)' }, 0.1)
+        .call(() => sfx('whoosh'), null, 0.15)
+        .call(leave, null, 0.45)
+        .to(scene, { '--gw-veil': 0, duration: 0.6, ease: 'power1.out' }, 0.4);
     }
     return new Promise((ok) => { done = ok; });
   }
 
-  // every visit opens with the ticket (with the last choices already picked); the intro waits on it
+  // every visit opens with the welcome (with the last choices already picked); the intro waits on it
   const gate = show({ first: true });
 
   // the top-bar sound button cycles music & sounds → just sounds → silent
