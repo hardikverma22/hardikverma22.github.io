@@ -1,4 +1,4 @@
-import { edgeArrows } from './edgearrows.js';
+import { initAfterHours } from './afterhours.js';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -723,43 +723,9 @@ pcStack.addEventListener('click', (e) => {
 pcStack.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') flip(1); if (e.key === 'ArrowLeft') flip(-1); });
 
 /* =====================================================================
-   AFTER HOURS: polaroids on a clothesline
+   AFTER HOURS: side projects, as they really look (see afterhours.js)
    ===================================================================== */
-const n = projects.length;
-const W = 'fill="none" stroke="#fffaf0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
-const polArt = {
-  'Travel Planner AI': `<svg viewBox="0 0 64 64"><path d="M8 50 C20 44 18 30 32 30 S46 18 56 14" ${W} stroke-dasharray="4 5"/><path d="M50 6 a8 8 0 0 1 8 8 c0 7 -8 14 -8 14 s-8 -7 -8 -14 a8 8 0 0 1 8 -8 Z" fill="#fffaf0"/><circle cx="50" cy="14" r="3" fill="var(--ink)"/><circle cx="8" cy="50" r="4" fill="#fffaf0"/></svg>`,
-  sandfit: `<svg viewBox="0 0 64 64"><path d="M32 6 L54 14 V32 C54 45 44 54 32 58 C20 54 10 45 10 32 V14 Z" fill="#fffaf0"/><path d="M21 33 l8 8 l15 -17" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 22 v-6 h6 M60 22 v-6 h-6" ${W} stroke-width="2.5" stroke-dasharray="2 4"/></svg>`,
-  'Voice Notes': `<svg viewBox="0 0 64 64"><rect x="24" y="8" width="16" height="28" rx="8" fill="#fffaf0"/><path d="M16 30 a16 16 0 0 0 32 0 M32 46 v10 M24 56 h16" ${W}/><path d="M4 32 v4 M10 28 v12 M54 28 v12 M60 32 v4" ${W}/></svg>`,
-  'Shoe Forge': `<svg viewBox="0 0 64 64"><path d="M6 44 V30 l10 -10 h8 l4 8 q10 6 24 8 q8 2 8 8 v4 Z" fill="#fffaf0"/><path d="M6 48 h54" ${W}/><path d="M22 28 l4 4 M26 25 l4 4" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/></svg>`,
-  CodeMe: `<svg viewBox="0 0 64 64"><path d="M22 18 L8 32 L22 46 M42 18 L56 32 L42 46 M36 12 L28 52" ${W} stroke-width="4"/></svg>`,
-};
-$('#line').innerHTML = projects.map((p, i) => {
-  const t = (i + 0.5) / n, dy = (1 - t) ** 2 * 20 + 2 * (1 - t) * t * 110 + t ** 2 * 20;
-  const href = p.live || p.code;
-  const tag = href ? `a href="${href}" target="_blank" rel="noopener"` : 'div tabindex="0"';
-  const end = href ? 'a' : 'div';
-  const initials = p.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2);
-  return `<li class="pol" style="--dy:${dy.toFixed(0)}px;--sd:${(-i * 0.7).toFixed(1)}s;--tilt:${i % 2 ? 5 : -5}deg">
-    <${tag} class="pol-c"><div class="pol-art" style="--h:${p.hue}"><em>${p.live ? 'live demo' : 'source'}</em>${polArt[p.name] || `<b>${esc(initials)}</b>`}</div>
-    <p class="pol-cap">${esc(p.name)}</p><p class="pol-what">${esc(p.what)}</p><p class="pol-stack">${esc(p.stack)}</p>
-    <p class="pol-go">${p.live ? 'Open the demo ↗' : 'Read the code ↗'}</p></${end}></li>`;
-}).join('');
-
-function hangPolaroids() {
-  const line = $('#line'), wrap = line.parentElement, W = wrap.offsetWidth;
-  if (innerWidth <= 900) { $$('.pol').forEach((p) => { p.style.marginTop = ''; }); return; }
-  $$('.pol').forEach((p) => {
-    p.style.marginTop = '0px';
-    const t = (p.offsetLeft + p.offsetWidth / 2) / W;
-    const ropeY = ((1 - t) ** 2 * 20 + 2 * (1 - t) * t * 110 + t ** 2 * 20) * (wrap.querySelector('svg').getBoundingClientRect().height / 120);
-    p.style.marginTop = `${(ropeY + 6).toFixed(1)}px`;
-  });
-}
-hangPolaroids();
-addEventListener('resize', hangPolaroids);
-edgeArrows($('#line'), { label: 'project' });
-document.fonts?.ready.then(hangPolaroids);
+initAfterHours($('#ah'), projects, { sfx, reduced });
 
 /* =====================================================================
    STACK: the keyboard + the medal rack (see keyboard.js, stack.js)
@@ -949,7 +915,6 @@ band.appendChild(foot);
 /* ---------------- section entrances ---------------- */
 if (!reduced) {
   $$('.sec-h, .gz, .pp-detail').forEach((el) => gsap.from(el, { y: 50, autoAlpha: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 85%' } }));
-  gsap.from('.pol', { y: -120, rotation: () => gsap.utils.random(-25, 25), autoAlpha: 0, stagger: 0.08, duration: 1, ease: 'elastic.out(1, .5)', scrollTrigger: { trigger: '#line', start: 'top 80%' } });
 }
 
 /* ---------------- sections off screen stop their idle loops (steam, bobbing, blinking) ---------------- */
